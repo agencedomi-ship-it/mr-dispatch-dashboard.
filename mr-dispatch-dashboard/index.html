@@ -1693,7 +1693,12 @@ render();
 goTo('dispatch');
 // charge les réglages sauvegardés ; si une URL de lecture existe, connexion auto
 const _saved = loadSettings();
-if(_saved.webhookUrl){ scheduleRefresh(); load(); }
+// Lit automatiquement les données depuis le Worker (/data) — plus besoin de la barre
+if(!document.getElementById('webhookUrl').value){
+  document.getElementById('webhookUrl').value = '/data';
+}
+scheduleRefresh();
+load();
 </script>
 </body>
 </html>
