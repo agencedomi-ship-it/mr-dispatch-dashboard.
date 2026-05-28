@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MR Dispatch · Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --bg:#f4f6f9;
+    --bg2:#eef1f5;
+    --panel:#ffffff;
+    --panel2:#f7f9fb;
+    --line:#e3e8ef;
+    --line2:#d3dae3;
+    --txt:#1a2230;
+    --txt2:#566276;
+    --txt3:#909bad;
+    --accent:#2d5fd6;
+    --accent2:#1e4bb8;
+    --accent-soft:#eaf0fc;
+    --green:#1f9d6b;
+    --green-bg:#e6f6ef;
+    --red:#d64545;
+    --red-bg:#fbeaea;
+    --blue:#2d7fd6;
+    --blue-bg:#e8f1fb;
+    --amber:#c98a1a;
+    --amber-bg:#fbf2e0;
+    --purple:#7257c9;
+    --purple-bg:#efebfa;
+    --orange:#d97335;
+    --shadow:0 1px 3px rgba(20,30,50,.06), 0 6px 20px rgba(20,30,50,.05);
+    --shadow-sm:0 1px 2px rgba(20,30,50,.05);
+    --r:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--txt);font-family:'Inter Tight',sans-serif;-webkit-font-smoothing:antialiased}
+  body{min-height:100vh;padding:0 0 60px}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:6px}
+  ::-webkit-scrollbar-thumb:hover{background:#b8c2cf}
+
+  /* ===== HEADER ===== */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.88);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    padding:13px 22px;
+  }
+  .hbar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;max-width:1500px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{
+    width:38px;height:38px;border-radius:10px;
+    background:var(--accent);
+    display:grid;place-items:center;font-family:'Archivo';font-weight:800;font-size:17px;color:#fff;
+    box-shadow:0 2px 8px rgba(45,95,214,.28);
+  }
+  .brand h1{font-family:'Archivo';font-weight:700;font-size:18px;letter-spacing:-.3px;line-height:1;color:var(--txt)}
+  .brand .sub{font-size:10.5px;color:var(--txt3);font-family:'IBM Plex Mono';letter-spacing:.6px;margin-top:3px}
+  .hspace{flex:1}
+  .live{
+    display:flex;align-items:center;gap:8px;font-size:12px;font-family:'IBM Plex Mono';
+    color:var(--txt2);padding:6px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(31,157,107,.5);animation:pulse 2s infinite}
+  .dot.off{background:var(--txt3);animation:none}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(31,157,107,.45)}70%{box-shadow:0 0 0 8px rgba(31,157,107,0)}100%{box-shadow:0 0 0 0 rgba(31,157,107,0)}}
+  .clock{font-family:'IBM Plex Mono';font-size:13px;color:var(--txt2);font-weight:500}
+
+  .conn{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .conn input{
+    background:var(--panel);border:1px solid var(--line2);color:var(--txt);
+    padding:8px 11px;border-radius:9px;font-family:'IBM Plex Mono';font-size:12px;width:300px;outline:none;transition:.15s
+  }
+  .conn input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,95,214,.12)}
+  .conn input::placeholder{color:var(--txt3)}
+  .btn{
+    border:1px solid var(--line2);background:var(--panel);color:var(--txt);
+    padding:8px 14px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s;font-family:'Inter Tight';white-space:nowrap;box-shadow:var(--shadow-sm)
+  }
+  .btn:hover{background:var(--panel2);border-color:#c2cbd6}
+  .btn.primary{background:var(--accent);border:1px solid var(--accent);color:#fff;box-shadow:0 1px 6px rgba(45,95,214,.25)}
+  .btn.primary:hover{background:var(--accent2);border-color:var(--accent2)}
+  .btn.sm{padding:6px 10px;font-size:11.5px}
+  select.btn{appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23566276' stroke-width='3'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center}
+
+  /* ===== LAYOUT ===== */
+  main{max-width:1500px;margin:0 auto;padding:22px}
+  .section-title{
+    font-family:'Archivo';font-weight:600;font-size:12px;letter-spacing:1px;text-transform:uppercase;
+    color:var(--txt3);margin:26px 4px 13px;display:flex;align-items:center;gap:9px
+  }
+  .section-title::before{content:"";width:4px;height:13px;background:var(--accent);border-radius:2px;display:inline-block}
+
+  /* KPI row */
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:13px}
+  .kpi{
+    background:var(--panel);
+    border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;position:relative;overflow:hidden;box-shadow:var(--shadow-sm)
+  }
+  .kpi.clickable{cursor:pointer;transition:.15s;user-select:none}
+  .kpi.clickable:hover{border-color:var(--accent);box-shadow:0 2px 10px rgba(45,95,214,.14);transform:translateY(-1px)}
+  .kpi.active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft), var(--shadow-sm)}
+  .kpi.active::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);border-radius:3px 0 0 3px}
+  .kpi .ic{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+  .kpi.g .ic{background:var(--green-bg);color:var(--green)} .kpi.b .ic{background:var(--blue-bg);color:var(--blue)}
+  .kpi.r .ic{background:var(--red-bg);color:var(--red)} .kpi.p .ic{background:var(--purple-bg);color:var(--purple)} .kpi.o .ic{background:var(--amber-bg);color:var(--amber)}
+  .kpi .lab{font-size:11px;color:var(--txt2);font-weight:600;letter-spacing:.2px;text-transform:uppercase}
+  .kpi .val{font-family:'Archivo';font-weight:700;font-size:30px;line-height:1;margin-top:11px;letter-spacing:-1px;color:var(--txt)}
+  .kpi .meta{font-size:11px;color:var(--txt3);margin-top:6px;font-family:'IBM Plex Mono'}
+
+  .grid{display:grid;grid-template-columns:1.55fr 1fr;gap:18px;align-items:start}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm)}
+  .panel-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .panel-h h2{font-family:'Archivo';font-weight:700;font-size:15px;letter-spacing:-.2px;color:var(--txt)}
+  .panel-h .count{font-family:'IBM Plex Mono';font-size:12px;color:var(--txt2);background:var(--bg2);padding:3px 9px;border-radius:20px;border:1px solid var(--line)}
+  .panel-h .hspace{flex:1}
+
+  /* filters */
+  .filters{display:flex;gap:7px;padding:11px 16px;flex-wrap:wrap;border-bottom:1px solid var(--line);background:var(--panel2)}
+  .chip{
+    font-size:12px;padding:5px 12px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:var(--txt2);
+    cursor:pointer;transition:.13s;font-weight:600;font-family:'Inter Tight'
+  }
+  .chip:hover{color:var(--txt);border-color:#c2cbd6}
+  .chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .search{margin-left:auto;background:var(--panel);border:1px solid var(--line2);color:var(--txt);padding:6px 11px;border-radius:8px;font-size:12.5px;outline:none;width:160px;font-family:'Inter Tight'}
+  .search:focus{border-color:var(--accent)}
+
+  /* interventions list */
+  .inter-list{max-height:560px;overflow-y:auto}
+  .inter{
+    display:grid;grid-template-columns:auto 1fr auto;gap:13px;align-items:center;
+    padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer;transition:.12s;position:relative
+  }
+  .inter:hover{background:var(--panel2)}
+  .inter:last-child{border-bottom:none}
+  .urg{width:3px;align-self:stretch;border-radius:3px;background:var(--line2);min-height:38px}
+  .urg.haute{background:var(--red)} .urg.moyenne{background:var(--amber)} .urg.basse{background:var(--blue)}
+  .inter-mid .top{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .inter-id{font-family:'IBM Plex Mono';font-size:12px;color:var(--txt3);font-weight:500}
+  .inter-type{font-weight:700;font-size:14.5px;color:var(--txt)}
+  .inter-mid .bot{font-size:12.5px;color:var(--txt2);margin-top:4px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .inter-mid .bot .sep{color:var(--line2)}
+  .ligne-tag{font-family:'IBM Plex Mono';font-size:10.5px;padding:2px 7px;border-radius:5px;font-weight:600;letter-spacing:.3px}
+  .pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:7px;white-space:nowrap;text-transform:uppercase;letter-spacing:.3px}
+  .pill.attente{background:var(--blue-bg);color:var(--blue)}
+  .pill.validation{background:var(--amber-bg);color:var(--amber)}
+  .pill.assigne{background:var(--green-bg);color:var(--green)}
+  .pill.rdv{background:var(--purple-bg);color:var(--purple)}
+  .pill.cloture{background:var(--bg2);color:var(--txt2)}
+  .pill.annule{background:var(--red-bg);color:var(--red)}
+  .inter-right{text-align:right;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+  .inter-tech{font-size:12.5px;color:var(--txt);font-weight:600}
+  .inter-tech.none{color:var(--txt3);font-style:italic;font-weight:400}
+  .inter-time{font-family:'IBM Plex Mono';font-size:11px;color:var(--txt3)}
+  /* bouton relance */
+  .btn-relance{
+    display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line2);background:var(--panel);
+    color:var(--accent);padding:5px 10px;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;
+    transition:.13s;font-family:'Inter Tight';white-space:nowrap
+  }
+  .btn-relance:hover{background:var(--accent-soft);border-color:var(--accent)}
+  .btn-relance svg{width:13px;height:13px}
+  .btn-relance.big{padding:9px 16px;font-size:13px;background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn-relance.big:hover{background:var(--accent2)}
+  /* modal relance */
+  .rl-intro{font-size:13px;color:var(--txt2);margin-bottom:14px;line-height:1.5}
+  .rl-intro b{color:var(--txt)}
+  .rl-targets{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+  .rl-target{font-size:12px;font-weight:600;padding:5px 11px;border-radius:7px;background:var(--accent-soft);color:var(--accent);font-family:'IBM Plex Mono'}
+  .rl-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--txt3);margin-bottom:9px}
+  .rl-models{display:flex;flex-direction:column;gap:9px;margin-bottom:8px}
+  .rl-model{
+    text-align:left;border:1px solid var(--line2);background:var(--panel);color:var(--txt);
+    padding:12px 14px;border-radius:10px;cursor:pointer;transition:.13s;font-size:13px;line-height:1.45;font-family:'Inter Tight'
+  }
+  .rl-model:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .rl-model .mt{font-weight:700;font-size:12px;color:var(--accent);margin-bottom:4px;display:block}
+  .rl-edit{width:100%;min-height:80px;border:1px solid var(--line2);border-radius:10px;padding:11px 13px;font-size:13px;font-family:'Inter Tight';color:var(--txt);resize:vertical;outline:none;line-height:1.5}
+  .rl-edit:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,95,214,.1)}
+  .rl-actions{display:flex;gap:9px;margin-top:14px}
+  .rl-actions .btn{flex:1;justify-content:center;text-align:center;display:inline-flex;align-items:center;gap:6px}
+  .rl-actions .btn svg{width:14px;height:14px;flex-shrink:0}
+  .rl-back{background:none;border:none;color:var(--txt3);font-size:12.5px;cursor:pointer;font-weight:600;padding:6px 0;display:inline-flex;align-items:center;gap:5px}
+  .rl-back svg{width:13px;height:13px;flex-shrink:0}
+  .rl-back:hover{color:var(--txt)}
+
+  /* right column stacked panels */
+  .stack{display:flex;flex-direction:column;gap:18px}
+
+  /* tech list */
+  .tech-list{max-height:300px;overflow-y:auto;padding:6px 0}
+  .tech{display:flex;align-items:center;gap:11px;padding:9px 16px;transition:.12s}
+  .tech:hover{background:var(--panel2)}
+  .tstat{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .tstat.dispo{background:var(--green);box-shadow:0 0 0 3px var(--green-bg)}
+  .tstat.occupe{background:var(--amber);box-shadow:0 0 0 3px var(--amber-bg)}
+  .tstat.off{background:var(--txt3)}
+  .tech .info{flex:1;min-width:0}
+  .tech .nm{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt)}
+  .tech .sec{font-size:11.5px;color:var(--txt3);font-family:'IBM Plex Mono';white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tech .tlab{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:3px 8px;border-radius:6px}
+  .tlab.dispo{background:var(--green-bg);color:var(--green)}
+  .tlab.occupe{background:var(--amber-bg);color:var(--amber)}
+  .tlab.off{background:var(--bg2);color:var(--txt3)}
+
+  /* pings */
+  .ping-wrap{padding:14px 16px;display:flex;flex-direction:column;gap:13px}
+  .ping-bar-row{display:flex;flex-direction:column;gap:6px}
+  .ping-bar-row .l{display:flex;justify-content:space-between;font-size:12.5px}
+  .ping-bar-row .l .n{font-weight:600;color:var(--txt)} .ping-bar-row .l .v{font-family:'IBM Plex Mono';color:var(--txt2)}
+  .bar{height:8px;background:var(--bg2);border-radius:6px;overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:6px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+
+  /* lignes stats */
+  .lignes{padding:8px 0}
+  .ligne-row{display:grid;grid-template-columns:90px 1fr auto;gap:12px;align-items:center;padding:10px 16px}
+  .ligne-row .nm{font-family:'IBM Plex Mono';font-size:12px;font-weight:600;padding:4px 9px;border-radius:6px;text-align:center}
+  .ligne-row .track{height:8px;background:var(--bg2);border-radius:6px;overflow:hidden}
+  .ligne-row .track > i{display:block;height:100%;border-radius:6px;transition:width .6s}
+  .ligne-row .cnt{font-family:'IBM Plex Mono';font-size:13px;font-weight:600;min-width:30px;text-align:right;color:var(--txt)}
+
+  /* mini widgets row */
+  .widgets{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .wcontent{padding:16px}
+  .gauge{display:flex;align-items:center;gap:16px}
+  .ring{position:relative;width:84px;height:84px;flex-shrink:0}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .ctr{position:absolute;inset:0;display:grid;place-items:center;font-family:'Archivo';font-weight:700;font-size:20px;color:var(--txt)}
+  .gauge .gx .big{font-family:'Archivo';font-weight:700;font-size:15px;color:var(--txt)}
+  .gauge .gx .sm{font-size:12px;color:var(--txt3);margin-top:3px}
+  .money{font-family:'Archivo';font-weight:700;font-size:30px;letter-spacing:-1px;color:var(--txt)}
+  .money-sub{font-size:12px;color:var(--txt3);margin-top:5px;font-family:'IBM Plex Mono'}
+  .spark{display:flex;align-items:flex-end;gap:4px;height:60px;margin-top:14px}
+  .spark > i{flex:1;background:var(--accent);border-radius:3px 3px 0 0;min-height:4px;opacity:.85;transition:.3s}
+  .spark > i:hover{opacity:1}
+  .hours-lab{display:flex;justify-content:space-between;font-size:10px;color:var(--txt3);font-family:'IBM Plex Mono';margin-top:6px}
+
+  .empty{padding:40px;text-align:center;color:var(--txt3);font-size:13.5px}
+
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(26,34,48,.42);backdrop-filter:blur(3px);z-index:100;display:none;place-items:center;padding:20px}
+  .modal-bg.open{display:grid}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:540px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 12px 48px rgba(20,30,50,.22)}
+  .modal-h{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--panel)}
+  .modal-h h3{font-family:'Archivo';font-weight:700;font-size:18px;flex:1;color:var(--txt)}
+  .modal-close{cursor:pointer;color:var(--txt3);font-size:24px;line-height:1;background:none;border:none;transition:.15s}
+  .modal-close:hover{color:var(--txt)}
+  .modal-body{padding:18px 20px}
+  .field{display:grid;grid-template-columns:130px 1fr;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .field:last-child{border:none}
+  .field .k{color:var(--txt3);font-weight:600;font-size:12.5px}
+  .field .v{color:var(--txt)}
+  .field .v.mono{font-family:'IBM Plex Mono';font-size:12.5px}
+
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--txt);border:1px solid var(--txt);color:#fff;padding:12px 20px;border-radius:10px;font-size:13.5px;z-index:200;transition:.3s;box-shadow:0 8px 30px rgba(20,30,50,.25);font-weight:500}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .toast.err{background:var(--red);border-color:var(--red);color:#fff}
+  .toast.ok{background:var(--green);border-color:var(--green);color:#fff}
+
+  /* alertes */
+  .alert{display:flex;align-items:flex-start;gap:11px;padding:13px 16px;border-radius:var(--r);margin-bottom:11px;border:1px solid;font-size:13.5px;line-height:1.45}
+  .alert svg{width:18px;height:18px;flex-shrink:0;margin-top:1px}
+  .alert.warn{background:var(--amber-bg);border-color:#f0d28a;color:#8a6311}
+  .alert.danger{background:var(--red-bg);border-color:#f0b3b3;color:#a82c2c}
+  .alert.info{background:var(--blue-bg);border-color:#aacdf2;color:#1d5aa0}
+  .alert b{font-weight:700}
+  /* toolbar */
+  .toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:4px}
+  /* pilotage grid */
+  .pilotage{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;align-items:start}
+  /* tech ranking */
+  .tech-rank{max-height:340px;overflow-y:auto}
+  .trank{display:grid;grid-template-columns:24px 1fr auto;gap:11px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line)}
+  .trank:last-child{border:none}
+  .trank .pos{font-family:'Archivo';font-weight:700;font-size:13px;color:var(--txt3);text-align:center}
+  .trank .pos.top{color:var(--accent)}
+  .trank .who{min-width:0}
+  .trank .who .nm{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .trank .who .ba{height:5px;background:var(--bg2);border-radius:4px;margin-top:5px;overflow:hidden;max-width:160px}
+  .trank .who .ba > i{display:block;height:100%;border-radius:4px}
+  .trank .stat{display:flex;gap:9px;align-items:center;font-family:'IBM Plex Mono';font-size:12px}
+  .trank .stat .g{color:var(--green);font-weight:600} .trank .stat .r{color:var(--red);font-weight:600}
+  .trank .stat .pc{font-weight:700;padding:3px 8px;border-radius:6px;font-size:11.5px}
+  .pc.hi{background:var(--green-bg);color:var(--green)} .pc.mid{background:var(--amber-bg);color:var(--amber)} .pc.lo{background:var(--red-bg);color:var(--red)}
+  /* RDV list */
+  .rdv-list{max-height:340px;overflow-y:auto}
+  .rdv-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+  .rdv-item:last-child{border:none}
+  .rdv-date{text-align:center;background:var(--purple-bg);color:var(--purple);border-radius:9px;padding:7px 10px;min-width:54px}
+  .rdv-date .d{font-family:'Archivo';font-weight:800;font-size:18px;line-height:1}
+  .rdv-date .m{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+  .rdv-info{flex:1;min-width:0}
+  .rdv-info .t{font-weight:600;font-size:13.5px}
+  .rdv-info .s{font-size:12px;color:var(--txt3);margin-top:2px}
+  .rdv-solde{text-align:right;font-family:'IBM Plex Mono';font-size:12px}
+  .rdv-solde .v{font-weight:700;font-size:14px;color:var(--txt)}
+  .rdv-solde .l{color:var(--txt3);font-size:10.5px}
+  /* metrics */
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+  .metric{background:var(--panel);padding:16px}
+  .metric .v{font-family:'Archivo';font-weight:800;font-size:26px;letter-spacing:-1px;color:var(--txt)}
+  .metric .l{font-size:11.5px;color:var(--txt3);margin-top:5px;font-weight:600}
+  .metric .v.sm{font-size:20px}
+
+  @media(max-width:1100px){
+    .pilotage{grid-template-columns:1fr}
+    .kpis{grid-template-columns:repeat(3,1fr)}
+    .grid{grid-template-columns:1fr}
+    .widgets{grid-template-columns:1fr}
+  }
+  @media(max-width:640px){
+    main{padding:14px}
+    .kpis{grid-template-columns:repeat(2,1fr);gap:10px}
+    .kpi .val{font-size:25px}
+    .conn input{width:100%;flex:1}
+    .conn{width:100%}
+    .inter{grid-template-columns:auto 1fr;gap:10px}
+    .inter-right{grid-column:2;flex-direction:row;justify-content:flex-start;align-items:center;margin-top:2px}
+    .hbar{gap:11px}
+    .clock{display:none}
+    .field{grid-template-columns:1fr;gap:2px}
+    .field .k{font-size:11px}
+  }
+
+  /* ===== SHELL : sidebar + content ===== */
+  .app{display:flex;min-height:100vh}
+  .sidebar{
+    width:236px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);
+    display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:40
+  }
+  .sb-brand{display:flex;align-items:center;gap:11px;padding:18px 18px 16px;border-bottom:1px solid var(--line)}
+  .sb-brand .logo{width:38px;height:38px;border-radius:10px;background:var(--accent);display:grid;place-items:center;font-family:'Archivo';font-weight:800;font-size:17px;color:#fff;box-shadow:0 2px 8px rgba(45,95,214,.28)}
+  .sb-brand h1{font-family:'Archivo';font-weight:700;font-size:16px;letter-spacing:-.3px;line-height:1}
+  .sb-brand .sub{font-size:9.5px;color:var(--txt3);font-family:'IBM Plex Mono';letter-spacing:.5px;margin-top:3px}
+  .sb-nav{flex:1;padding:12px 10px;overflow-y:auto}
+  .sb-link{
+    display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:9px;cursor:pointer;
+    color:var(--txt2);font-weight:600;font-size:13.5px;transition:.13s;margin-bottom:3px;position:relative;border:none;background:none;width:100%;text-align:left;font-family:'Inter Tight'
+  }
+  .sb-link svg{width:18px;height:18px;flex-shrink:0;stroke:currentColor}
+  .sb-link:hover{background:var(--panel2);color:var(--txt)}
+  .sb-link.on{background:var(--accent-soft);color:var(--accent)}
+  .sb-link .badge{margin-left:auto;font-family:'IBM Plex Mono';font-size:11px;background:var(--bg2);color:var(--txt2);padding:1px 7px;border-radius:20px;font-weight:600}
+  .sb-link.on .badge{background:var(--accent);color:#fff}
+  .sb-foot{padding:12px;border-top:1px solid var(--line)}
+  .sb-live{display:flex;align-items:center;gap:8px;font-size:11.5px;font-family:'IBM Plex Mono';color:var(--txt2);padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
+
+  .content{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:12px 22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .topbar .page-title{font-family:'Archivo';font-weight:700;font-size:18px;letter-spacing:-.3px}
+  .topbar .hspace{flex:1}
+  .page{padding:22px;display:none}
+  .page.active{display:block;animation:fadein .25s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* mobile burger */
+  .burger{display:none;background:var(--panel);border:1px solid var(--line2);border-radius:9px;width:38px;height:38px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0}
+  .burger svg{width:20px;height:20px;stroke:var(--txt)}
+  .sb-backdrop{display:none;position:fixed;inset:0;background:rgba(20,30,50,.4);z-index:39}
+
+  /* ===== Analyse : histogramme ===== */
+  .hist{display:flex;align-items:flex-end;gap:10px;height:180px;padding:10px 4px 0}
+  .hist-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+  .hist-bars{display:flex;align-items:flex-end;gap:3px;height:140px;width:100%;justify-content:center}
+  .hist-bars > i{width:13px;border-radius:3px 3px 0 0;transition:.4s;min-height:3px}
+  .hist-lab{font-size:10.5px;color:var(--txt3);font-family:'IBM Plex Mono';white-space:nowrap}
+  .hist-legend{display:flex;gap:16px;padding:12px 16px 0;flex-wrap:wrap}
+  .hist-legend span{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2)}
+  .hist-legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  /* ligne analyse */
+  .ligne-analyse{padding:6px 0}
+  .la-row{display:grid;grid-template-columns:1fr auto auto auto;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
+  .la-row:last-child{border:none}
+  .la-row.head{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--txt3);font-weight:700;background:var(--panel2)}
+  .la-row .ln{font-family:'IBM Plex Mono';font-weight:600;font-size:12.5px;padding:3px 9px;border-radius:6px;justify-self:start}
+  .la-row .m{font-family:'IBM Plex Mono';font-size:13px;text-align:right;min-width:54px}
+  .la-row .m b{font-weight:700}
+  .la-row .tx{font-weight:700;padding:3px 8px;border-radius:6px;font-size:11.5px;text-align:center}
+
+  /* recur + dup lists */
+  .recur-list,.dup-list{max-height:320px;overflow-y:auto}
+  .recur-item{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line)}
+  .recur-item:last-child{border:none}
+  .recur-av{width:36px;height:36px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:'Archivo';font-weight:700;font-size:14px;flex-shrink:0}
+  .recur-item .info{flex:1;min-width:0}
+  .recur-item .nm{font-size:13.5px;font-weight:600}
+  .recur-item .s{font-size:12px;color:var(--txt3);margin-top:2px}
+  .recur-item .cnt{font-family:'Archivo';font-weight:800;font-size:20px;color:var(--accent)}
+  .dup-item{padding:11px 16px;border-bottom:1px solid var(--line);border-left:3px solid var(--amber)}
+  .dup-item:last-child{border-bottom:none}
+  .dup-item .h{font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px}
+  .dup-item .ids{font-family:'IBM Plex Mono';font-size:11.5px;color:var(--txt2);margin-top:5px;line-height:1.6}
+  .dup-item .ids .id{background:var(--bg2);padding:2px 7px;border-radius:5px;margin-right:5px}
+
+  /* actions menu on interventions */
+  .inter-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+  .btn-act{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line2);background:var(--panel);color:var(--txt2);padding:4px 9px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;transition:.12s;font-family:'Inter Tight';white-space:nowrap}
+  .btn-act:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .btn-act.g:hover{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+  .btn-act.r:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+  .btn-act svg{width:12px;height:12px}
+
+  /* action modal form */
+  .af-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--txt3);margin:14px 0 8px}
+  .af-input,.af-select{width:100%;border:1px solid var(--line2);border-radius:9px;padding:10px 12px;font-size:13.5px;font-family:'Inter Tight';color:var(--txt);outline:none;background:var(--panel)}
+  .af-input:focus,.af-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,95,214,.1)}
+  .af-summary{font-size:13px;color:var(--txt2);line-height:1.5;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .af-summary b{color:var(--txt)}
+
+  /* finance cards */
+  .fin-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:18px}
+  .fin-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--shadow-sm)}
+  .fin-card .l{font-size:11px;color:var(--txt2);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+  .fin-card .v{font-family:'Archivo';font-weight:800;font-size:26px;letter-spacing:-1px;margin-top:9px;color:var(--txt)}
+  .fin-card .m{font-size:11px;color:var(--txt3);margin-top:5px;font-family:'IBM Plex Mono'}
+
+  @media(max-width:980px){
+    .sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);transition:.25s;box-shadow:var(--shadow)}
+    .sidebar.open{transform:none}
+    .sb-backdrop.show{display:block}
+    .burger{display:flex}
+    .fin-grid{grid-template-columns:repeat(2,1fr)}
+  }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+      <div class="logo">M</div>
+      <div><h1>MR Dispatch</h1><div class="sub">ÉTABLISSEMENT PEREZ</div></div>
+    </div>
+    <nav class="sb-nav">
+      <button class="sb-link" id="nav-dispatch" onclick="goTo('dispatch')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg><span>Dispatch</span></button>
+      <button class="sb-link" id="nav-techniciens" onclick="goTo('techniciens')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Techniciens</span></button>
+      <button class="sb-link" id="nav-pings" onclick="goTo('pings')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg><span>Pings & Dispatch</span></button>
+      <button class="sb-link" id="nav-rdv" onclick="goTo('rdv')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span>RDV & Suivi</span></button>
+      <button class="sb-link" id="nav-finance" onclick="goTo('finance')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>Finance</span></button>
+      <button class="sb-link" id="nav-analyse" onclick="goTo('analyse')"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg><span>Analyse</span></button>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-live"><span class="dot" id="liveDot"></span><span id="liveTxt">Aperçu (données réelles)</span></div>
+    </div>
+  </aside>
+  <div class="sb-backdrop" id="sbBackdrop" onclick="document.getElementById('sidebar').classList.remove('open');this.classList.remove('show')"></div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="topbar">
+      <button class="burger" onclick="document.getElementById('sidebar').classList.toggle('open');document.getElementById('sbBackdrop').classList.toggle('show')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="page-title" id="pageTitle">Dispatch</span>
+      <span class="clock" id="clock">--:--:--</span>
+      <div class="hspace"></div>
+      <div class="conn">
+        <input id="webhookUrl" type="text" placeholder="URL lecture (GET)">
+        <input id="relanceUrl" type="text" placeholder="URL relance (POST)">
+        <input id="actionUrl" type="text" placeholder="URL actions (POST)">
+        <input id="secretKey" type="password" placeholder="Clé secrète" style="width:110px">
+        <select class="btn" id="refreshRate" title="Rafraîchissement">
+          <option value="0">Manuel</option><option value="10000">10 s</option>
+          <option value="30000" selected>30 s</option><option value="60000">1 min</option>
+        </select>
+        <button class="btn primary" id="connectBtn">Connecter</button>
+      </div>
+    </div>
+
+    <!-- PAGE: DISPATCH -->
+    <section class="page active" id="page-dispatch">
+      <div class="kpis" id="kpis"></div>
+      <div id="alertsZone"></div>
+      <div class="toolbar" id="toolbar"></div>
+      <div class="section-title">Interventions du jour</div>
+      <div class="panel">
+        <div class="panel-h"><h2>File d'interventions</h2><span class="count" id="interCount">0</span><div class="hspace"></div></div>
+        <div class="filters" id="interFilters">
+          <button class="chip on" data-f="tous">Tous</button>
+          <button class="chip" data-f="encours">En cours</button>
+          <button class="chip" data-f="attente">En attente</button>
+          <button class="chip" data-f="validation">En validation</button>
+          <button class="chip" data-f="assigne">Attribuée</button>
+          <button class="chip" data-f="rdv">RDV</button>
+          <button class="chip" data-f="cloture">Terminée</button>
+          <button class="chip" data-f="annule">Annulée</button>
+          <input class="search" id="interSearch" placeholder="Rechercher…">
+        </div>
+        <div class="inter-list" id="interList"></div>
+      </div>
+    </section>
+
+    <!-- PAGE: TECHNICIENS -->
+    <section class="page" id="page-techniciens">
+      <div class="pilotage">
+        <div class="panel">
+          <div class="panel-h"><h2>Statut des techniciens</h2><span class="count" id="techCount">0</span><div class="hspace"></div><span class="inter-time" id="techSummary"></span></div>
+          <div class="tech-list" id="techList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Performance</h2><div class="hspace"></div><span class="inter-time">prises · annul. · taux</span></div>
+          <div class="tech-rank" id="techRank"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE: PINGS -->
+    <section class="page" id="page-pings">
+      <div class="pilotage">
+        <div class="panel">
+          <div class="panel-h"><h2>État des pings</h2></div>
+          <div class="ping-wrap" id="pingWrap"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Indicateurs dispatch</h2></div>
+          <div class="metrics" id="metrics"></div>
+        </div>
+      </div>
+      <div class="section-title">Conversion</div>
+      <div class="panel"><div class="wcontent">
+        <div class="gauge">
+          <div class="ring">
+            <svg width="84" height="84" viewBox="0 0 84 84">
+              <circle cx="42" cy="42" r="36" fill="none" stroke="var(--bg2)" stroke-width="9"/>
+              <circle id="convRing" cx="42" cy="42" r="36" fill="none" stroke="var(--accent)" stroke-width="9" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="226"/>
+            </svg>
+            <div class="ctr" id="convPct">0%</div>
+          </div>
+          <div class="gx"><div class="big" id="convBig">0 / 0</div><div class="sm">interventions prises<br>vs reçues aujourd'hui</div></div>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- PAGE: RDV -->
+    <section class="page" id="page-rdv">
+      <div class="pilotage">
+        <div class="panel">
+          <div class="panel-h"><h2>RDV à venir</h2><span class="count" id="rdvCount">0</span></div>
+          <div class="rdv-list" id="rdvList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Par département</h2></div>
+          <div class="lignes" id="secteurs"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE: FINANCE -->
+    <section class="page" id="page-finance">
+      <div class="fin-grid" id="finCards"></div>
+      <div class="pilotage">
+        <div class="panel">
+          <div class="panel-h"><h2>CA par technicien</h2></div>
+          <div class="lignes" id="finByTech"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Chiffre du jour</h2></div>
+          <div class="wcontent">
+            <div class="money" id="caJour">0 €</div>
+            <div class="money-sub" id="caSub">0 interventions facturées</div>
+            <div class="spark" id="spark"></div>
+            <div class="hours-lab"><span>8h</span><span>12h</span><span>16h</span><span>20h</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE: ANALYSE -->
+    <section class="page" id="page-analyse">
+      <div class="pilotage">
+        <div class="panel">
+          <div class="panel-h"><h2>Évolution (multi-jours)</h2><div class="hspace"></div><span class="inter-time" id="histSummary"></span></div>
+          <div class="wcontent"><div id="histChart"></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Par ligne d'appel</h2></div>
+          <div class="ligne-analyse" id="ligneAnalyse"></div>
+        </div>
+      </div>
+      <div class="pilotage">
+        <div class="panel">
+          <div class="panel-h"><h2>Clients récurrents</h2><span class="count" id="recurCount">0</span></div>
+          <div class="recur-list" id="recurList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Doublons potentiels</h2><span class="count" id="dupCount">0</span></div>
+          <div class="dup-list" id="dupList"></div>
+        </div>
+      </div>
+      <div class="section-title">Statistiques globales</div>
+      <div class="pilotage">
+        <div class="panel"><div class="panel-h"><h2>Par ligne (volume)</h2></div><div class="lignes" id="lignes"></div></div>
+        <div class="panel"><div class="panel-h"><h2>Outils</h2></div><div class="wcontent"><div class="toolbar" id="toolbar2"></div></div></div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- Modal détail -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-h"><h3 id="mTitle">Intervention</h3><button class="modal-close" id="mClose">&times;</button></div>
+    <div class="modal-body" id="mBody"></div>
+  </div>
+</div>
+
+<!-- Modal relance -->
+<div class="modal-bg" id="rlBg">
+  <div class="modal">
+    <div class="modal-h"><h3 id="rlTitle">Relancer</h3><button class="modal-close" id="rlClose">&times;</button></div>
+    <div class="modal-body" id="rlBody"></div>
+  </div>
+</div>
+
+<!-- Modal action -->
+<div class="modal-bg" id="actBg">
+  <div class="modal">
+    <div class="modal-h"><h3 id="actTitle">Action</h3><button class="modal-close" onclick="closeAction()">&times;</button></div>
+    <div class="modal-body" id="actBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+
+/* ============================================================
+   MR Dispatch Dashboard
+   Attend un JSON: { interventions:[...], techniciens:[...], suivi:[...] }
+   Les clés des objets = noms de colonnes EXACTS de tes pages Google Sheets.
+   ============================================================ */
+
+const RELANCE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>';
+
+const LIGNE_COLORS = {
+  'PEREZ':     {bg:'#eaf0fc', c:'#2d5fd6'},
+  'TEXEIRA':   {bg:'#e8f1fb', c:'#2d7fd6'},
+  'ARTISAN PC':{bg:'#e6f6ef', c:'#1f9d6b'},
+  'MON PETIT': {bg:'#efebfa', c:'#7257c9'},
+  'ALVES':     {bg:'#fbf2e0', c:'#c98a1a'},
+  '_def':      {bg:'#eef1f5', c:'#566276'}
+};
+
+let STATE = { interventions:[], techniciens:[], suivi:[] };
+let currentFilter = 'tous';
+let searchTerm = '';
+let timer = null;
+
+/* ---------- Statut normalisation ---------- */
+// Mappe le champ "statut" libre de ton sheet vers une catégorie d'affichage.
+function statutCat(s){
+  // normalise: minuscules + suppression des accents + underscores -> espaces
+  s = (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/_/g,' ').trim();
+  // statuts réels du robot dispatcher : en_attente, en_validation, attribuee, rdv, terminee, annulee
+  if(/annul|abandon/.test(s)) return 'annule';
+  if(/termin|clotur|fini|fait|paye|facture|regle/.test(s)) return 'cloture';
+  if(/rdv|rendez/.test(s)) return 'rdv';
+  if(/validation|en cours|a valider|valider/.test(s)) return 'validation';
+  if(/attribu|assign|accept|en route|sur place|confirm/.test(s)) return 'assigne';
+  if(/ping|envoy|recherche|dispatch|candidat|notifi|attente/.test(s)) return 'attente';
+  return 'attente';
+}
+const STATUT_LABEL = {attente:'En attente',validation:'En validation',assigne:'Attribuée',rdv:'RDV',cloture:'Terminée',annule:'Annulée'};
+
+function ligneStyle(l){
+  const k = (l||'').toString().toUpperCase().trim();
+  return LIGNE_COLORS[k] || LIGNE_COLORS['_def'];
+}
+
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+// Parse une date "JJ/MM/AAAA HH:MM" (format du robot) ou ISO -> objet Date, ou null
+function parseDate(s){
+  if(!s) return null;
+  s = s.toString().trim();
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2})[:h](\d{2}))?/);
+  if(m){
+    return new Date(+m[3], +m[2]-1, +m[1], m[4]?+m[4]:0, m[5]?+m[5]:0);
+  }
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+function sameDay(a,b){ return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
+function isToday(dateStr){
+  const d = parseDate(dateStr);
+  return d ? sameDay(d, new Date()) : false;
+}
+// extrait HH:MM d'une date robot ou d'un champ heure ("11h00")
+function heureOf(x){
+  if(x.heure_prise){ const h=x.heure_prise.toString().replace('h',':'); if(/^\d{1,2}:\d{2}/.test(h)) return h.slice(0,5); }
+  const d = parseDate(x.date_creation||x.timestamp_assignation);
+  return d ? String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0') : '';
+}
+function num(v){ const n = parseFloat((v||'').toString().replace(/[^\d.,-]/g,'').replace(',','.')); return isNaN(n)?0:n; }
+function fmtMoney(n){ return new Intl.NumberFormat('fr-FR').format(Math.round(n))+' €'; }
+function esc(s){ return (s==null?'':s).toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ---------- RENDER ---------- */
+function render(){
+  const I = STATE.interventions || [];
+  // KPI
+  const cats = I.map(x=>statutCat(x.statut));
+  const c = k => cats.filter(x=>x===k).length;
+  const total = I.length;
+  const ca = I.filter(x=>statutCat(x.statut)==='cloture').reduce((a,x)=>a+num(x.prix),0);
+  const enCoursN = I.filter(x=>['attente','validation','assigne'].includes(statutCat(x.statut))).length;
+  const rdvN = I.filter(x=>statutCat(x.statut)==='rdv').length;
+
+  const I_ = s => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${s}</svg>`;
+  const ICONS = {
+    total: I_('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>'),
+    attente: I_('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    ping: I_('<path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>'),
+    assigne: I_('<path d="M20 6L9 17l-5-5"/>'),
+    cloture: I_('<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'),
+    ca: I_('<path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'),
+    encours: I_('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+    rdv: I_('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>')
+  };
+  const kpis = [
+    {lab:'Total', val:total, meta:"interventions aujourd'hui", cls:'', ic:ICONS.total, f:'tous'},
+    {lab:'En cours', val:enCoursN, meta:'non clôturées', cls:'b', ic:ICONS.encours, f:'encours'},
+    {lab:'RDV', val:rdvN, meta:'rendez-vous programmés', cls:'o', ic:ICONS.rdv, f:'rdv'},
+    {lab:'Attribuées', val:c('assigne'), meta:'tech assigné', cls:'g', ic:ICONS.assigne, f:'assigne'},
+    {lab:'Terminées', val:c('cloture'), meta:'facturées', cls:'p', ic:ICONS.cloture, f:'cloture'},
+    {lab:'CA du jour', val:fmtMoney(ca), meta:'facturé', cls:'g', ic:ICONS.ca, f:'cloture'},
+  ];
+  document.getElementById('kpis').innerHTML = kpis.map(k=>{
+    const isActive = k.f===currentFilter && !(k.f==='cloture' && k.lab==='CA du jour');
+    return `
+    <div class="kpi ${k.cls} clickable ${isActive?'active':''}" data-f="${k.f}">
+      <div class="ic">${k.ic}</div>
+      <div class="lab">${k.lab}</div>
+      <div class="val">${k.val}</div>
+      <div class="meta">${k.meta}</div>
+    </div>`;}).join('');
+  document.querySelectorAll('#kpis .kpi.clickable').forEach(n=>{
+    n.onclick=()=>applyFilter(n.dataset.f, true);
+  });
+
+  // Interventions list
+  let list = I.slice();
+  if(currentFilter==='encours'){
+    list = list.filter(x=>['attente','validation','assigne'].includes(statutCat(x.statut)));
+  } else if(currentFilter!=='tous'){
+    list = list.filter(x=>statutCat(x.statut)===currentFilter);
+  }
+  if(searchTerm){
+    const t = searchTerm.toLowerCase();
+    list = list.filter(x=>JSON.stringify(x).toLowerCase().includes(t));
+  }
+  // tri: actifs d'abord (attente, validation, assigne, rdv), puis terminées/annulées; plus récents en haut
+  const order = {attente:0,validation:1,assigne:2,rdv:3,cloture:4,annule:5};
+  list.sort((a,b)=> (order[statutCat(a.statut)]-order[statutCat(b.statut)]) || ((parseDate(b.date_creation)||0)-(parseDate(a.date_creation)||0)));
+
+  document.getElementById('interCount').textContent = list.length;
+  const el = document.getElementById('interList');
+  if(!list.length){ el.innerHTML = `<div class="empty">Aucune intervention ${currentFilter!=='tous'?'dans ce filtre':'aujourd\'hui'}.</div>`; }
+  else el.innerHTML = list.map((x,i)=>{
+    const cat = statutCat(x.statut);
+    const ls = ligneStyle(x.ligne_appel);
+    const urg = (x.urgence||'').toString().toLowerCase();
+    const tech = x.tech_assigne_nom ? esc(x.tech_assigne_nom) : 'Non assigné';
+    const heure = heureOf(x);
+    const relancable = (cat==='assigne'||cat==='attente'||cat==='validation');
+    return `<div class="inter" data-idx="${I.indexOf(x)}">
+      <div class="urg ${urg}"></div>
+      <div class="inter-mid">
+        <div class="top">
+          <span class="inter-id">${esc(x.inter_id||'#'+(i+1))}</span>
+          <span class="inter-type">${esc(x.type||'Intervention')}</span>
+          <span class="ligne-tag" style="background:${ls.bg};color:${ls.c}">${esc(x.ligne_appel||'—')}</span>
+        </div>
+        <div class="bot">
+          <span>${esc(x.cp_ville||x.departement||'Lieu ?')}</span>
+          <span class="sep">·</span>
+          <span>${esc(x.nom_client||'Sans nom')}</span>
+          ${x.prix?`<span class="sep">·</span><span>${esc(x.prix)}€</span>`:''}
+        </div>
+      </div>
+      <div class="inter-right">
+        <span class="pill ${cat}">${STATUT_LABEL[cat]}</span>
+        <span class="inter-tech ${x.tech_assigne_nom?'':'none'}">${tech}</span>
+        ${heure?`<span class="inter-time">${heure}</span>`:''}
+        ${relancable?`<button class="btn-relance" data-relance="${I.indexOf(x)}">${RELANCE_ICON} Relancer</button>`:''}
+      </div>
+      ${actBtnHtml(x, I.indexOf(x))}
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.inter').forEach(n=>n.onclick=(e)=>{
+    if(e.target.closest('[data-relance]')||e.target.closest('[data-act]')) return; // boutons ne déclenchent pas la fiche
+    openModal(I[+n.dataset.idx]);
+  });
+  el.querySelectorAll('[data-relance]').forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    openRelance(I[+b.dataset.relance]);
+  });
+  el.querySelectorAll('[data-act]').forEach(b=>b.onclick=(e)=>{
+    e.stopPropagation();
+    openAction(I[+b.dataset.actidx], b.dataset.act);
+  });
+
+  renderTechs();
+  renderPings();
+  renderLignes();
+  renderWidgets();
+  renderAlerts();
+  renderToolbar();
+  renderTechRank();
+  renderRdv();
+  renderSecteurs();
+  renderMetrics();
+  // pages analyse + finance
+  renderHistory();
+  renderLigneAnalyse();
+  renderRecur();
+  renderDup();
+  renderFinance();
+}
+
+/* ---------- Techniciens ---------- */
+function techStatut(t){
+  // un tech est "occupé" s'il a une intervention assignée non clôturée aujourd'hui
+  const nom = (t['Nom du partenaire']||'').toString().trim();
+  if(!nom) return 'off';
+  const busy = (STATE.interventions||[]).some(x=>{
+    const c = statutCat(x.statut);
+    return (x.tech_assigne_nom||'').toString().trim()===nom && (c==='assigne'||c==='validation'||c==='rdv');
+  });
+  if(busy) return 'occupe';
+  if((t['Rappel desactive']||'').toString().toLowerCase().match(/oui|true|1|x/)) return 'off';
+  return 'dispo';
+}
+function renderTechs(){
+  const T = (STATE.techniciens||[]).filter(t=>(t['Nom du partenaire']||'').toString().trim());
+  document.getElementById('techCount').textContent = T.length;
+  const withStat = T.map(t=>({t, s:techStatut(t)}));
+  const order={dispo:0,occupe:1,off:2};
+  withStat.sort((a,b)=>order[a.s]-order[b.s]);
+  const nd = withStat.filter(x=>x.s==='dispo').length;
+  const no = withStat.filter(x=>x.s==='occupe').length;
+  document.getElementById('techSummary').textContent = `${nd} dispo · ${no} occupé`;
+  const lab={dispo:'Dispo',occupe:'Occupé',off:'Off'};
+  document.getElementById('techList').innerHTML = withStat.map(({t,s})=>`
+    <div class="tech">
+      <span class="tstat ${s}"></span>
+      <div class="info">
+        <div class="nm">${esc(t['Nom du partenaire'])}</div>
+        <div class="sec">${esc(t['Secteurs']||t['Métiers']||'—')}</div>
+      </div>
+      <span class="tlab ${s}">${lab[s]}</span>
+    </div>`).join('') || `<div class="empty">Aucun technicien.</div>`;
+}
+
+/* ---------- Pings ---------- */
+function renderPings(){
+  const I = STATE.interventions||[];
+  // pings = techs dispatchés par intervention (champ msg_ids_pings ou techs_dispatches)
+  let envoyes=0, prises=0, refuses=0, enCours=0;
+  I.forEach(x=>{
+    const c = statutCat(x.statut);
+    const pings = (x.msg_ids_pings||'').toString().split(';').filter(Boolean).length
+               || (x.techs_dispatches||'').toString().split(/[\/;,]/).filter(Boolean).length;
+    const ref = (x.refus||'').toString().split(/[\/;,]/).filter(Boolean).length;
+    envoyes += pings;
+    refuses += ref;
+    if(c==='assigne'||c==='cloture'||c==='rdv'||c==='validation') prises++;
+    if(c==='attente'||c==='validation') enCours++;
+  });
+  const rows = [
+    {n:'Prises en charge', v:prises, color:'var(--green)', max:I.length},
+    {n:'Refus enregistrés', v:refuses, color:'var(--red)', max:envoyes},
+    {n:'En attente de réponse', v:enCours, color:'var(--accent)', max:I.length},
+  ];
+  document.getElementById('pingWrap').innerHTML =
+    `<div class="ping-bar-row"><div class="l"><span class="n">Total pings envoyés</span><span class="v">${envoyes}</span></div></div>`+
+    rows.map(r=>`
+    <div class="ping-bar-row">
+      <div class="l"><span class="n">${r.n}</span><span class="v">${r.v}${r.max?` · ${Math.round(r.v/r.max*100)||0}%`:''}</span></div>
+      <div class="bar"><i style="width:${r.max?Math.min(100,r.v/r.max*100):0}%;background:${r.color}"></i></div>
+    </div>`).join('');
+}
+
+/* ---------- Lignes ---------- */
+function renderLignes(){
+  const I = STATE.interventions||[];
+  const map = {};
+  I.forEach(x=>{ const l=(x.ligne_appel||'—').toString().toUpperCase().trim(); map[l]=(map[l]||0)+1; });
+  const entries = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  const max = Math.max(1,...entries.map(e=>e[1]));
+  document.getElementById('lignes').innerHTML = entries.map(([l,n])=>{
+    const s = ligneStyle(l);
+    return `<div class="ligne-row">
+      <span class="nm" style="background:${s.bg};color:${s.c}">${esc(l)}</span>
+      <div class="track"><i style="width:${n/max*100}%;background:${s.c}"></i></div>
+      <span class="cnt">${n}</span>
+    </div>`;
+  }).join('') || `<div class="empty">Pas de données.</div>`;
+}
+
+/* ---------- Widgets ---------- */
+function renderWidgets(){
+  const I = STATE.interventions||[];
+  const recues = I.length;
+  const assignees = I.filter(x=>['assigne','cloture','rdv','validation'].includes(statutCat(x.statut))).length;
+  const pct = recues? Math.round(assignees/recues*100):0;
+  document.getElementById('convPct').textContent = pct+'%';
+  document.getElementById('convBig').textContent = `${assignees} / ${recues}`;
+  const circ = 2*Math.PI*36;
+  document.getElementById('convRing').style.strokeDasharray = circ;
+  document.getElementById('convRing').style.strokeDashoffset = circ*(1-pct/100);
+
+  const closed = I.filter(x=>statutCat(x.statut)==='cloture');
+  const ca = closed.reduce((a,x)=>a+num(x.prix),0);
+  document.getElementById('caJour').textContent = fmtMoney(ca);
+  document.getElementById('caSub').textContent = `${closed.length} intervention${closed.length>1?'s':''} facturée${closed.length>1?'s':''}`;
+
+  // sparkline: répartition par tranche horaire 8->20h
+  const buckets = new Array(12).fill(0); // 8h..20h (12 tranches d'1h)
+  I.forEach(x=>{
+    const h = parseInt((x.heure_prise||x.date_creation||'').toString().slice(11,13));
+    if(!isNaN(h) && h>=8 && h<20) buckets[h-8]++;
+  });
+  const mx = Math.max(1,...buckets);
+  document.getElementById('spark').innerHTML = buckets.map(b=>`<i style="height:${b/mx*100}%" title="${b}"></i>`).join('');
+}
+
+/* ---------- Modal ---------- */
+function openModal(x){
+  document.getElementById('mTitle').textContent = `${x.type||'Intervention'} · ${x.inter_id||''}`;
+  const ls = ligneStyle(x.ligne_appel);
+  const fields = [
+    ['Statut', x.statut],
+    ['Urgence', x.urgence],
+    ['Client', x.nom_client],
+    ['Téléphone', x.tel_client, 'mono'],
+    ['Adresse', x.adresse],
+    ['CP / Ville', x.cp_ville],
+    ['Département', x.departement],
+    ['Ligne', x.ligne_appel],
+    ['Mode', x.mode],
+    ['Tech assigné', x.tech_assigne_nom],
+    ['Tél tech', x.tech_assigne_tel, 'mono'],
+    ['Candidats', x.candidats, 'mono'],
+    ['Refus', x.refus],
+    ['Prix', x.prix?x.prix+' €':''],
+    ['Acompte', x.acompte],
+    ['Devis', x.montant_devis],
+    ['Déplacement', x.montant_deplacement],
+    ['Paiement', x.paiement],
+    ['Date RDV', x.date_rdv],
+    ['Heure prise', x.heure_prise],
+    ['Message client', x.message_client],
+    ['Infos', x.infos_supplementaires],
+    ['Observation', x.observation],
+  ];
+  document.getElementById('mBody').innerHTML = fields
+    .filter(f=>f[1]!=null && f[1].toString().trim()!=='')
+    .map(f=>`<div class="field"><div class="k">${f[0]}</div><div class="v ${f[2]||''}">${esc(f[1])}</div></div>`).join('')
+    + (['assigne','rdv','attente','validation'].includes(statutCat(x.statut))
+        ? `<div style="margin-top:18px"><button class="btn-relance big" id="mRelance">${RELANCE_ICON} Relancer ${(['attente','validation'].includes(statutCat(x.statut)))?'les techniciens':'le technicien'}</button></div>`
+        : '');
+  const mr = document.getElementById('mRelance');
+  if(mr) mr.onclick=()=>{ document.getElementById('modalBg').classList.remove('open'); openRelance(x); };
+  document.getElementById('modalBg').classList.add('open');
+}
+document.getElementById('mClose').onclick=()=>document.getElementById('modalBg').classList.remove('open');
+document.getElementById('modalBg').onclick=(e)=>{ if(e.target.id==='modalBg') document.getElementById('modalBg').classList.remove('open'); };
+
+/* ---------- Alertes ---------- */
+function renderAlerts(){
+  const I = STATE.interventions||[];
+  const alerts = [];
+  // 1) annulations en série par tech (>=3 annulations)
+  const annulParTech = {};
+  I.filter(x=>statutCat(x.statut)==='annule').forEach(x=>{
+    const t = (x.tech_assigne_nom||'?').toString().trim();
+    annulParTech[t] = (annulParTech[t]||0)+1;
+  });
+  Object.entries(annulParTech).filter(([t,n])=>n>=3 && t!=='?').forEach(([t,n])=>{
+    alerts.push({type:'danger', icon:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+      html:`<b>${n} annulations</b> attribuées à <b>${esc(t)}</b> aujourd'hui — tech potentiellement injoignable ou peu fiable, à surveiller.`});
+  });
+  // 2) interventions en attente depuis longtemps
+  const now = new Date();
+  const vieilles = I.filter(x=>{
+    if(statutCat(x.statut)!=='attente') return false;
+    const d = parseDate(x.date_creation); if(!d) return false;
+    return (now-d)/60000 > 20 && sameDay(d,now);
+  });
+  if(vieilles.length){
+    alerts.push({type:'warn', icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+      html:`<b>${vieilles.length} intervention${vieilles.length>1?'s':''}</b> en attente depuis plus de 20 min sans attribution.`});
+  }
+  // 3) en validation bloquées (clic mais pas confirmé)
+  const valid = I.filter(x=>statutCat(x.statut)==='validation');
+  if(valid.length){
+    alerts.push({type:'info', icon:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+      html:`<b>${valid.length} intervention${valid.length>1?'s':''}</b> en validation — un tech a cliqué mais la prise n'est pas confirmée.`});
+  }
+  document.getElementById('alertsZone').innerHTML = alerts.map(a=>`
+    <div class="alert ${a.type}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${a.icon}</svg>
+      <div>${a.html}</div>
+    </div>`).join('');
+}
+
+/* ---------- Toolbar (actualiser + export) ---------- */
+function renderToolbar(){
+  document.querySelectorAll('.toolbar').forEach(tb=>{
+    if(tb.dataset.init) return;
+    tb.dataset.init='1';
+    tb.innerHTML = `
+      <button class="btn sm tb-refresh">↻ Actualiser</button>
+      <button class="btn sm tb-export">⤓ Exporter CSV</button>`;
+    tb.querySelector('.tb-refresh').onclick=()=>{ load(); };
+    tb.querySelector('.tb-export').onclick=exportCSV;
+  });
+}
+function exportCSV(){
+  const I = STATE.interventions||[];
+  if(!I.length){ toast('Rien à exporter','err'); return; }
+  const cols = ['inter_id','date_creation','statut','type','nom_client','tel_client','cp_ville','ligne_appel','tech_assigne_nom','prix','date_rdv'];
+  const head = cols.join(',');
+  const rows = I.map(x=>cols.map(c=>{
+    let v=(x[c]==null?'':x[c]).toString().replace(/"/g,'""');
+    return /[",;\n]/.test(v)?`"${v}"`:v;
+  }).join(','));
+  const csv = [head,...rows].join('\n');
+  const blob = new Blob([`\ufeff${csv}`],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `dispatch_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('Export CSV téléchargé ✓','ok');
+}
+
+/* ---------- Performance techniciens ---------- */
+function renderTechRank(){
+  const I = STATE.interventions||[];
+  const stats = {};
+  I.forEach(x=>{
+    const t = (x.tech_assigne_nom||'').toString().trim();
+    if(!t) return;
+    const c = statutCat(x.statut);
+    stats[t] = stats[t] || {nom:t, prises:0, annul:0, fini:0, total:0};
+    stats[t].total++;
+    if(c==='annule') stats[t].annul++;
+    else stats[t].prises++;
+    if(c==='cloture') stats[t].fini++;
+  });
+  const arr = Object.values(stats).map(s=>{
+    s.taux = s.total ? Math.round(s.prises/s.total*100) : 0;
+    return s;
+  }).sort((a,b)=> b.prises-a.prises || a.annul-b.annul);
+  const maxTotal = Math.max(1,...arr.map(s=>s.total));
+  document.getElementById('techRank').innerHTML = arr.map((s,i)=>{
+    const pcCls = s.taux>=70?'hi':s.taux>=40?'mid':'lo';
+    return `<div class="trank">
+      <div class="pos ${i<3?'top':''}">${i+1}</div>
+      <div class="who">
+        <div class="nm">${esc(s.nom)}</div>
+        <div class="ba"><i style="width:${s.total/maxTotal*100}%;background:var(--accent)"></i></div>
+      </div>
+      <div class="stat">
+        <span class="g" title="prises en charge">${s.prises}</span>
+        <span class="r" title="annulations">${s.annul}</span>
+        <span class="pc ${pcCls}">${s.taux}%</span>
+      </div>
+    </div>`;
+  }).join('') || `<div class="empty">Aucun technicien assigné.</div>`;
+}
+
+/* ---------- RDV à venir ---------- */
+const MOIS = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+function renderRdv(){
+  const I = STATE.interventions||[];
+  const rdvs = I.filter(x=>statutCat(x.statut)==='rdv')
+    .map(x=>({x, d:parseDate(x.date_rdv)}))
+    .sort((a,b)=>(a.d||0)-(b.d||0));
+  document.getElementById('rdvCount').textContent = rdvs.length;
+  document.getElementById('rdvList').innerHTML = rdvs.map(({x,d})=>{
+    const solde = num(x.prix) - num(x.acompte);
+    const jour = d? d.getDate() : '—';
+    const mois = d? MOIS[d.getMonth()] : '';
+    const heure = d? String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0') : '';
+    return `<div class="rdv-item">
+      <div class="rdv-date"><div class="d">${jour}</div><div class="m">${mois}</div></div>
+      <div class="rdv-info">
+        <div class="t">${esc(x.type||'')} · ${esc(x.tech_assigne_nom||'?')}</div>
+        <div class="s">${esc(x.cp_ville||'')} · ${esc(x.nom_client||'')} ${heure?'· '+heure:''}</div>
+      </div>
+      ${num(x.prix)?`<div class="rdv-solde"><div class="v">${fmtMoney(solde)}</div><div class="l">solde restant</div></div>`:''}
+    </div>`;
+  }).join('') || `<div class="empty">Aucun RDV programmé.</div>`;
+}
+
+/* ---------- Par département ---------- */
+function renderSecteurs(){
+  const I = STATE.interventions||[];
+  const map = {};
+  I.forEach(x=>{ const d=(x.departement||'?').toString().trim(); map[d]=(map[d]||0)+1; });
+  const entries = Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const max = Math.max(1,...entries.map(e=>e[1]));
+  document.getElementById('secteurs').innerHTML = entries.map(([d,n])=>`
+    <div class="ligne-row">
+      <span class="nm" style="background:var(--accent-soft);color:var(--accent)">Dép. ${esc(d)}</span>
+      <div class="track"><i style="width:${n/max*100}%;background:var(--accent)"></i></div>
+      <span class="cnt">${n}</span>
+    </div>`).join('') || `<div class="empty">Pas de données.</div>`;
+}
+
+/* ---------- Indicateurs clés ---------- */
+function renderMetrics(){
+  const I = STATE.interventions||[];
+  // délai moyen d'attribution
+  let dsum=0, dcount=0;
+  I.forEach(x=>{
+    const a=parseDate(x.date_creation), b=parseDate(x.timestamp_assignation);
+    if(a&&b){ const m=(b-a)/60000; if(m>=0&&m<240){ dsum+=m; dcount++; } }
+  });
+  const delaiMoy = dcount? Math.round(dsum/dcount) : 0;
+  // panier moyen (terminées avec prix)
+  const fin = I.filter(x=>statutCat(x.statut)==='cloture' && num(x.prix)>0);
+  const panier = fin.length? Math.round(fin.reduce((a,x)=>a+num(x.prix),0)/fin.length) : 0;
+  // taux d'annulation
+  const annul = I.filter(x=>statutCat(x.statut)==='annule').length;
+  const tauxAnnul = I.length? Math.round(annul/I.length*100) : 0;
+  // CA potentiel (RDV avec devis/prix non encore facturé)
+  const caPot = I.filter(x=>statutCat(x.statut)==='rdv').reduce((a,x)=>a+(num(x.prix)-num(x.acompte)),0);
+
+  const metrics = [
+    {v:delaiMoy+' min', l:"Délai moyen d'attribution"},
+    {v:fmtMoney(panier), l:'Panier moyen (terminées)', sm:true},
+    {v:tauxAnnul+'%', l:"Taux d'annulation"},
+    {v:fmtMoney(caPot), l:'CA potentiel (RDV)', sm:true},
+  ];
+  document.getElementById('metrics').innerHTML = metrics.map(m=>`
+    <div class="metric"><div class="v ${m.sm?'sm':''}">${m.v}</div><div class="l">${m.l}</div></div>`).join('');
+}
+
+/* ---------- Relance technicien ---------- */
+// Détermine qui relancer selon le statut de l'intervention
+function relanceTargets(x){
+  const cat = statutCat(x.statut);
+  if(cat==='assigne' || cat==='rdv'){
+    return {
+      mode:'tech',
+      noms:[ (x.tech_assigne_nom||'').toString().trim() ].filter(Boolean),
+      tels:[ (x.tech_assigne_tel||'').toString().trim() ].filter(Boolean)
+    };
+  }
+  // attente/validation : techs dispatchés (noms lisibles dans "techs_dispatches": "Tech_A / Tech_B / Tech_C")
+  const dispatched = (x.techs_dispatches||'').toString().split(/[\/;,]/).map(s=>s.trim()).filter(Boolean);
+  const refus = (x.refus||'').toString().split(/[\/;,]/).map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const enAttente = dispatched.filter(c=>!refus.includes(c.toLowerCase()));
+  return { mode:'candidats', noms:enAttente.length?enAttente:dispatched, tels:[] };
+}
+
+// Modèles de message selon le contexte
+function relanceModels(x, t){
+  const id = x.inter_id||'';
+  const ville = x.cp_ville||x.departement||'';
+  const type = x.type||'intervention';
+  if(t.mode==='tech'){
+    return [
+      {t:`Point d'avancement`, m:`Salut, tu en es où sur l'intervention ${id} (${type} - ${ville}) ? Tiens-moi au courant 🙏`},
+      {t:`Confirmation arrivée`, m:`Bonjour, peux-tu me confirmer ton heure d'arrivée pour ${id} à ${ville} ? Le client attend.`},
+      {t:`Relance ferme`, m:`${id} : pas de nouvelles de ta part. Merci de me répondre rapidement sur l'état de l'intervention à ${ville}.`}
+    ];
+  }
+  return [
+    {t:'Relance dispo', m:`Intervention toujours dispo : ${type} à ${ville} (${id}). Qui peut la prendre ? Répondez vite 🔧`},
+    {t:'Rappel urgent', m:`⏰ Rappel ${id} - ${type} ${ville}. Client en attente, première réponse = mission attribuée.`},
+    {t:'Dernière chance', m:`Dernier appel pour ${id} (${ville}). Sans réponse je redispatch ailleurs.`}
+  ];
+}
+
+let RL_CTX = null; // {x, target, message}
+
+function openRelance(x){
+  const t = relanceTargets(x);
+  RL_CTX = {x, t, message:null};
+  document.getElementById('rlTitle').textContent = `Relancer · ${x.inter_id||''}`;
+  if(!t.noms.length){
+    document.getElementById('rlBody').innerHTML = `<div class="rl-intro">Aucun destinataire identifié pour cette intervention (pas de tech assigné ni de candidat en attente).</div>`;
+    document.getElementById('rlBg').classList.add('open');
+    return;
+  }
+  renderRelanceStep1();
+  document.getElementById('rlBg').classList.add('open');
+}
+
+function renderRelanceStep1(){
+  const {x, t} = RL_CTX;
+  const who = t.mode==='tech' ? 'le technicien assigné' : `${t.noms.length} technicien${t.noms.length>1?'s':''} pingé${t.noms.length>1?'s':''}`;
+  const models = relanceModels(x, t);
+  document.getElementById('rlBody').innerHTML = `
+    <div class="rl-intro">Relance de <b>${who}</b> pour l'intervention <b>${esc(x.type||'')}</b> à ${esc(x.cp_ville||x.departement||'')}.</div>
+    <div class="rl-targets">${t.noms.map(n=>`<span class="rl-target">${esc(n)}</span>`).join('')}</div>
+    <div class="rl-label">Choisis un modèle de message</div>
+    <div class="rl-models">
+      ${models.map((m,i)=>`<button class="rl-model" data-m="${i}"><span class="mt">${esc(m.t)}</span>${esc(m.m)}</button>`).join('')}
+    </div>`;
+  document.querySelectorAll('#rlBody .rl-model').forEach(b=>{
+    b.onclick=()=> renderRelanceStep2(models[+b.dataset.m].m);
+  });
+}
+
+function renderRelanceStep2(msg){
+  RL_CTX.message = msg;
+  const {t} = RL_CTX;
+  document.getElementById('rlBody').innerHTML = `
+    <button class="rl-back" id="rlBack">${RELANCE_ICON} Changer de modèle</button>
+    <div class="rl-label" style="margin-top:14px">Message à envoyer (modifiable)</div>
+    <textarea class="rl-edit" id="rlEdit">${esc(msg)}</textarea>
+    <div class="rl-intro" style="margin-top:10px;margin-bottom:0">Envoyé à : ${t.noms.map(n=>esc(n)).join(', ')}</div>
+    <div class="rl-actions">
+      <button class="btn" id="rlCancel">Annuler</button>
+      <button class="btn primary" id="rlSend">${RELANCE_ICON} Envoyer la relance</button>
+    </div>`;
+  document.getElementById('rlBack').onclick=renderRelanceStep1;
+  document.getElementById('rlCancel').onclick=closeRelance;
+  document.getElementById('rlSend').onclick=sendRelance;
+}
+
+async function sendRelance(){
+  const msg = document.getElementById('rlEdit').value.trim();
+  if(!msg){ toast('Le message est vide','err'); return; }
+  const {x, t} = RL_CTX;
+  const url = document.getElementById('relanceUrl').value.trim();
+  const payload = {
+    action:'relance',
+    secret: getSecret(),
+    inter_id: x.inter_id||'',
+    mode: t.mode,                          // 'tech' ou 'candidats'
+    destinataires_noms: t.noms,            // noms (= noms de groupe WhatsApp)
+    destinataires_tels: t.tels,            // tel du tech assigné si dispo
+    candidats: (x.candidats||'').toString(),
+    refus: (x.refus||'').toString(),
+    message: msg,
+    ligne_appel: x.ligne_appel||''
+  };
+
+  const sendBtn = document.getElementById('rlSend');
+  if(sendBtn){ sendBtn.disabled=true; sendBtn.textContent='Envoi…'; }
+
+  // Sans webhook configuré -> mode démo : on simule l'envoi
+  if(!url){
+    setTimeout(()=>{
+      closeRelance();
+      toast(`Relance simulée (démo) vers ${t.noms.join(', ')} ✓`,'ok');
+    }, 500);
+    return;
+  }
+
+  try{
+    const r = await fetch(url, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    closeRelance();
+    toast('Relance envoyée ✓','ok');
+  }catch(e){
+    if(sendBtn){ sendBtn.disabled=false; sendBtn.innerHTML=RELANCE_ICON+' Envoyer la relance'; }
+    toast(`Échec de l'envoi : `+e.message,'err');
+  }
+}
+
+function closeRelance(){ document.getElementById('rlBg').classList.remove('open'); RL_CTX=null; }
+document.getElementById('rlClose').onclick=closeRelance;
+document.getElementById('rlBg').onclick=(e)=>{ if(e.target.id==='rlBg') closeRelance(); };
+
+/* ---------- Filters ---------- */
+function applyFilter(f, scroll){
+  currentFilter = f;
+  // synchronise les chips
+  document.querySelectorAll('#interFilters .chip').forEach(x=>{
+    x.classList.toggle('on', x.dataset.f===f);
+  });
+  render();
+  if(scroll){
+    document.querySelector('.grid').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+}
+document.getElementById('interFilters').querySelectorAll('.chip').forEach(c=>{
+  c.onclick=()=>applyFilter(c.dataset.f, false);
+});
+document.getElementById('interSearch').oninput=(e)=>{ searchTerm=e.target.value; render(); };
+
+/* ---------- Clock ---------- */
+setInterval(()=>{
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('fr-FR');
+},1000);
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+(type||'');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.className='toast',3200);
+}
+
+/* ---------- Data loading ---------- */
+async function fetchData(url){
+  const r = await fetch(url, {cache:'no-store'});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const j = await r.json();
+  // Accepte plusieurs formes: {interventions,techniciens,suivi} OU un tableau brut d'interventions
+  if(Array.isArray(j)) return {interventions:j, techniciens:[], suivi:[]};
+  return {
+    interventions: j.interventions || j.Interventions || [],
+    techniciens:   j.techniciens   || j.Techniciens   || [],
+    suivi:         j.suivi         || j.Suivi         || []
+  };
+}
+
+function setLive(on){
+  document.getElementById('liveDot').className = 'dot'+(on?'':' off');
+  document.getElementById('liveTxt').textContent = on ? 'En direct' : 'Aperçu (données réelles)';
+}
+
+async function load(){
+  const url = document.getElementById('webhookUrl').value.trim();
+  if(!url){ STATE = DEMO(); setLive(false); render(); return; }
+  try{
+    STATE = await fetchData(url);
+    setLive(true);
+    render();
+    toast('Données mises à jour ✓','ok');
+  }catch(e){
+    setLive(false);
+    toast('Erreur de connexion : '+e.message+' — vérifie l\'URL / le CORS du webhook n8n','err');
+  }
+}
+
+document.getElementById('connectBtn').onclick=()=>{ saveSettings(); scheduleRefresh(); load(); };
+document.getElementById('refreshRate').onchange=()=>{ saveSettings(); scheduleRefresh(); };
+
+// Persistance des réglages dans le navigateur (pas dans le code -> rien de sensible sur GitHub)
+const SETTINGS_KEY = 'mr_dispatch_settings_v1';
+function saveSettings(){
+  try{
+    const s = {
+      webhookUrl: document.getElementById('webhookUrl').value.trim(),
+      relanceUrl: document.getElementById('relanceUrl').value.trim(),
+      actionUrl: document.getElementById('actionUrl').value.trim(),
+      secretKey: document.getElementById('secretKey').value,
+      refreshRate: document.getElementById('refreshRate').value
+    };
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+  }catch(e){ /* localStorage indispo (ex: mode privé) -> on ignore */ }
+}
+function loadSettings(){
+  try{
+    const s = JSON.parse(localStorage.getItem(SETTINGS_KEY)||'{}');
+    if(s.webhookUrl) document.getElementById('webhookUrl').value = s.webhookUrl;
+    if(s.relanceUrl) document.getElementById('relanceUrl').value = s.relanceUrl;
+    if(s.actionUrl) document.getElementById('actionUrl').value = s.actionUrl;
+    if(s.secretKey) document.getElementById('secretKey').value = s.secretKey;
+    if(s.refreshRate) document.getElementById('refreshRate').value = s.refreshRate;
+    return s;
+  }catch(e){ return {}; }
+}
+function getSecret(){ return document.getElementById('secretKey').value || ''; }
+
+function scheduleRefresh(){
+  if(timer) clearInterval(timer);
+  const rate = +document.getElementById('refreshRate').value;
+  const url = document.getElementById('webhookUrl').value.trim();
+  if(rate>0 && url){ timer=setInterval(load,rate); }
+}
+
+/* ============================================================
+   DONNÉES DÉMO — supprimées dès qu'une URL webhook est fournie
+   ============================================================ */
+function DEMO(){
+  const interventions = [{"inter_id": "jja25", "date_creation": "27/05/2026 11:00", "statut": "annulee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Clara saline", "tel_client": "0621395635", "cp_ville": "99000 Thorigny-sur-Marne", "departement": "99", "adresse": "14 Rue de la Madeleine", "ligne_appel": "Alves", "tech_assigne_nom": "Tech_A", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "11h00", "msg_ids_pings": "a;b;c", "raison_annulation": "", "timestamp_assignation": "27/05/2026 11:01", "timestamp_premier_clic": "27/05/2026 11:00"}, {"inter_id": "7we9u", "date_creation": "27/05/2026 11:05", "statut": "attribuee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Clara saline", "tel_client": "0621395635", "cp_ville": "99000 Thorigny-sur-Marne", "departement": "99", "adresse": "14 Rue de la Madeleine", "ligne_appel": "Alves", "tech_assigne_nom": "Lucas", "tech_assigne_tel": "", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "11h05", "msg_ids_pings": "a;b;c", "timestamp_assignation": "27/05/2026 11:16", "timestamp_premier_clic": "27/05/2026 11:05"}, {"inter_id": "2yuz7", "date_creation": "27/05/2026 15:00", "statut": "en_validation", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Clara saline", "tel_client": "0621395635", "cp_ville": "99000 Thorigny-sur-Marne", "departement": "99", "adresse": "14 Rue de la Madeleine", "ligne_appel": "Alves", "tech_assigne_nom": "", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "15h00", "msg_ids_pings": "a;b;c", "timestamp_assignation": "27/05/2026 15:01", "timestamp_premier_clic": "27/05/2026 15:00"}, {"inter_id": "zfv76", "date_creation": "27/05/2026 15:22", "statut": "annulee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Clara saline", "tel_client": "0621395635", "cp_ville": "99000 Thorigny-sur-Marne", "departement": "99", "adresse": "14 Rue de la Madeleine", "ligne_appel": "Alves", "tech_assigne_nom": "Tech_A", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "15h22", "msg_ids_pings": "a;b;c", "timestamp_assignation": "27/05/2026 15:22", "timestamp_premier_clic": "27/05/2026 15:22"}, {"inter_id": "mv7z3", "date_creation": "27/05/2026 15:24", "statut": "en_attente", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Clara saline", "tel_client": "0621395635", "cp_ville": "99000 Thorigny-sur-Marne", "departement": "99", "adresse": "14 Rue de la Madeleine", "ligne_appel": "Alves", "tech_assigne_nom": "", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "15h24", "msg_ids_pings": "a;b;c", "timestamp_premier_clic": "27/05/2026 15:24"}, {"inter_id": "26zku", "date_creation": "27/05/2026 15:45", "statut": "attribuee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Clara saline", "tel_client": "0621395635", "cp_ville": "99000 Thorigny-sur-Marne", "departement": "99", "adresse": "14 Rue de la Madeleine", "ligne_appel": "Alves", "tech_assigne_nom": "Lucas", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "15h45", "msg_ids_pings": "a;b;c", "timestamp_assignation": "27/05/2026 15:46", "timestamp_premier_clic": "27/05/2026 15:45"}, {"inter_id": "xw53p", "date_creation": "27/05/2026 15:48", "statut": "en_attente", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Clara saline", "tel_client": "0621395635", "cp_ville": "99000 Thorigny-sur-Marne", "departement": "99", "adresse": "14 Rue de la Madeleine", "ligne_appel": "Alves", "tech_assigne_nom": "", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "15h48", "msg_ids_pings": "a;b;c", "timestamp_premier_clic": "27/05/2026 15:48"}, {"inter_id": "j3w3b", "date_creation": "27/05/2026 16:06", "statut": "attribuee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Clara saline", "tel_client": "0621395635", "cp_ville": "99000 Thorigny-sur-Marne", "departement": "99", "adresse": "14 Rue de la Madeleine", "ligne_appel": "Alves", "tech_assigne_nom": "Tech_C", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "16h06", "msg_ids_pings": "a;b;c", "timestamp_assignation": "27/05/2026 16:06", "timestamp_premier_clic": "27/05/2026 16:06"}, {"inter_id": "95kaf", "date_creation": "27/05/2026 20:05", "statut": "attribuee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Lucas", "temps_arrivee": "30min", "paiement": "Fichet", "infos_supplementaires": "39€ minimum - CB", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "20h05", "msg_ids_pings": "a;b;c", "timestamp_assignation": "27/05/2026 20:06", "timestamp_premier_clic": "27/05/2026 20:05"}, {"inter_id": "byg76", "date_creation": "27/05/2026 20:08", "statut": "terminee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Tech_A", "temps_arrivee": "30min", "paiement": "Fichet", "prix": "1000", "cam": "50", "acompte": "0", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "20h08", "msg_ids_pings": "a;b;c", "timestamp_assignation": "27/05/2026 20:08", "timestamp_premier_clic": "27/05/2026 20:08"}, {"inter_id": "78qbr", "date_creation": "28/05/2026 08:02", "statut": "annulee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Tech_A", "temps_arrivee": "30min", "paiement": "Fichet", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "08h02", "msg_ids_pings": "a;b;c", "timestamp_assignation": "28/05/2026 08:03", "timestamp_premier_clic": "28/05/2026 08:02"}, {"inter_id": "4h6fy", "date_creation": "28/05/2026 08:18", "statut": "annulee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Tech_A", "temps_arrivee": "30min", "paiement": "Fichet", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "08h18", "msg_ids_pings": "a;b;c", "timestamp_assignation": "28/05/2026 08:18", "timestamp_premier_clic": "28/05/2026 08:18"}, {"inter_id": "xe85h", "date_creation": "28/05/2026 08:21", "statut": "annulee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Tech_A", "temps_arrivee": "30min", "paiement": "Fichet", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "08h21", "msg_ids_pings": "a;b;c", "timestamp_assignation": "28/05/2026 08:22", "timestamp_premier_clic": "28/05/2026 08:21"}, {"inter_id": "f6vu7", "date_creation": "28/05/2026 08:34", "statut": "annulee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Tech_A", "temps_arrivee": "30min", "paiement": "Fichet", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "08h34", "msg_ids_pings": "a;b;c", "timestamp_assignation": "28/05/2026 08:34", "timestamp_premier_clic": "28/05/2026 08:34"}, {"inter_id": "k8k8d", "date_creation": "28/05/2026 08:36", "statut": "attribuee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Lucas", "temps_arrivee": "30min", "paiement": "Fichet", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "08h36", "msg_ids_pings": "a;b;c", "timestamp_assignation": "28/05/2026 08:38", "timestamp_premier_clic": "28/05/2026 08:36"}, {"inter_id": "4t6hz", "date_creation": "28/05/2026 09:16", "statut": "attribuee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Lucas", "temps_arrivee": "30min", "paiement": "Fichet", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "09h16", "msg_ids_pings": "a;b;c", "timestamp_assignation": "28/05/2026 09:18", "timestamp_premier_clic": "28/05/2026 09:16"}, {"inter_id": "yt8b8", "date_creation": "28/05/2026 09:20", "statut": "annulee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Tech_A", "temps_arrivee": "30min", "paiement": "Fichet", "prix": "1000", "acompte": "500", "techs_dispatches": "Tech_A / Tech_B / Tech_C", "heure_prise": "09h20", "msg_ids_pings": "a;b;c", "timestamp_assignation": "28/05/2026 09:20", "timestamp_premier_clic": "28/05/2026 09:20"}, {"inter_id": "uth44", "date_creation": "28/05/2026 09:27", "statut": "terminee", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Lucas", "temps_arrivee": "30min", "paiement": "Fichet", "prix": "1000", "cam": "100", "acompte": "0", "techs_dispatches": "Lucas / Tech_A / Tech_B / Tech_C", "heure_prise": "09h27", "msg_ids_pings": "a;b;c;d", "timestamp_assignation": "28/05/2026 09:28", "timestamp_premier_clic": "28/05/2026 09:27"}, {"inter_id": "6ym9a", "date_creation": "28/05/2026 09:32", "statut": "en_validation", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "", "temps_arrivee": "30min", "paiement": "Fichet", "techs_dispatches": "Lucas / Tech_A / Tech_B / Tech_C", "heure_prise": "09h32", "msg_ids_pings": "a;b;c;d", "timestamp_assignation": "28/05/2026 09:35", "timestamp_premier_clic": "28/05/2026 09:32"}, {"inter_id": "3vhw2", "date_creation": "28/05/2026 09:39", "statut": "rdv", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Lucas", "temps_arrivee": "30min", "date_rdv": "12/12/2012 15:00", "paiement": "Fichet", "techs_dispatches": "Lucas / Tech_A / Tech_B / Tech_C", "heure_prise": "09h39", "msg_ids_pings": "a;b;c;d", "timestamp_assignation": "28/05/2026 09:39", "timestamp_premier_clic": "28/05/2026 09:39"}, {"inter_id": "5c5ej", "date_creation": "28/05/2026 10:11", "statut": "rdv", "urgence": "URGENT", "type": "Ouverture de porte", "nom_client": "Mr lopes André", "tel_client": "0612345678", "cp_ville": "Cannes 99200", "departement": "99", "adresse": "12 rue du large", "ligne_appel": "Alves", "tech_assigne_nom": "Tech_A", "temps_arrivee": "30min", "date_rdv": "29/05/2026 09:00", "paiement": "Fichet", "prix": "1000", "acompte": "500", "observation": "14", "techs_dispatches": "Lucas / Tech_A / Tech_B / Tech_C", "heure_prise": "10h11", "msg_ids_pings": "a;b;c;d", "timestamp_assignation": "28/05/2026 10:11", "timestamp_premier_clic": "28/05/2026 10:11", "montant_devis": "1000"}];
+  const techniciens = [{"Nom du partenaire": "Maël", "Métiers": "Serrurerie", "Secteurs": "06/13", "Nom du groupe WhatsApp": "Maël 06/13", "Group id": "120363374067713688@g.us", "Rappel desactive": ""}, {"Nom du partenaire": "Yass", "Métiers": "Serrurerie", "Secteurs": "06/83", "Nom du groupe WhatsApp": "Yass 06/83", "Group id": "120363408130362059@g.us", "Rappel desactive": ""}, {"Nom du partenaire": "Meyer", "Métiers": "Serrurerie", "Secteurs": "75/77/78/91/92/93/94/95/60", "Nom du groupe WhatsApp": "Meyer IDF 30%", "Group id": "120363421277356122@g.us", "Rappel desactive": ""}, {"Nom du partenaire": "Sacha", "Métiers": "Serrurerie", "Secteurs": "75/77/78/91/92/93/94/95/60", "Nom du groupe WhatsApp": "Sacha IDF 30%", "Group id": "120363404733662749@g.us", "Rappel desactive": ""}, {"Nom du partenaire": "James", "Métiers": "Serrurerie", "Secteurs": "22/35/56", "Nom du groupe WhatsApp": "James 22/35/56", "Group id": "120363399689552277@g.us", "Rappel desactive": "oui"}, {"Nom du partenaire": "Lucas", "Métiers": "Serrurerie", "Secteurs": "75/77/78/91/92/93/94/95/60/99", "Nom du groupe WhatsApp": "Lucas Tiss IDF", "Group id": "120363426976718769@g.us", "Rappel desactive": ""}, {"Nom du partenaire": "Paul", "Métiers": "Serrurerie", "Secteurs": "75/77/78/91/92/93/94/95/60", "Nom du groupe WhatsApp": "Paul IDF", "Group id": "120363407657710336@g.us", "Rappel desactive": ""}, {"Nom du partenaire": "Repa", "Métiers": "Serrurerie", "Secteurs": "44/85/49", "Nom du groupe WhatsApp": "Repa - Angelo 44/85/49", "Group id": "120363406910107873@g.us", "Rappel desactive": "oui"}, {"Nom du partenaire": "Tech_A", "Métiers": "Serrurerie", "Secteurs": "99", "Nom du groupe WhatsApp": "Tech_1", "Group id": "120363409862582519@g.us", "Rappel desactive": ""}, {"Nom du partenaire": "Tech_B", "Métiers": "Serrurerie", "Secteurs": "99", "Nom du groupe WhatsApp": "Tech_2", "Group id": "120363426009980271@g.us", "Rappel desactive": ""}, {"Nom du partenaire": "Tech_C", "Métiers": "Serrurerie", "Secteurs": "99", "Nom du groupe WhatsApp": "Tech_3", "Group id": "120363411149014453@g.us", "Rappel desactive": ""}];
+  return {interventions, techniciens, suivi:[]};
+}
+
+/* ============================================================
+   PAGES — navigation routeur
+   ============================================================ */
+const PAGES = ['dispatch','techniciens','pings','rdv','finance','analyse'];
+const PAGE_TITLES = {dispatch:'Dispatch',techniciens:'Techniciens',pings:'Pings & Dispatch',rdv:'RDV & Suivi',finance:'Finance',analyse:'Analyse'};
+let currentPage = 'dispatch';
+
+function goTo(page){
+  if(!PAGES.includes(page)) page='dispatch';
+  currentPage = page;
+  PAGES.forEach(p=>{
+    const el = document.getElementById('page-'+p);
+    if(el) el.classList.toggle('active', p===page);
+    const lk = document.getElementById('nav-'+p);
+    if(lk) lk.classList.toggle('on', p===page);
+  });
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[page];
+  // fermer sidebar mobile
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sbBackdrop').classList.remove('show');
+  window.scrollTo({top:0});
+}
+
+/* ============================================================
+   VUES D'ANALYSE
+   ============================================================ */
+
+/* ---------- Historique multi-jours ---------- */
+function renderHistory(){
+  const I = STATE.interventions||[];
+  // grouper par jour (date_creation)
+  const byDay = {};
+  I.forEach(x=>{
+    const d = parseDate(x.date_creation); if(!d) return;
+    const key = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+    byDay[key] = byDay[key] || {total:0, fini:0, annul:0, ca:0, ts:d.getTime()};
+    byDay[key].total++;
+    const c = statutCat(x.statut);
+    if(c==='cloture'){ byDay[key].fini++; byDay[key].ca += num(x.prix); }
+    if(c==='annule') byDay[key].annul++;
+  });
+  const days = Object.entries(byDay).sort((a,b)=>a[1].ts-b[1].ts).slice(-14);
+  const max = Math.max(1,...days.map(([k,v])=>v.total));
+  const el = document.getElementById('histChart');
+  if(!days.length){ el.innerHTML = `<div class="empty">Pas encore d'historique.</div>`; return; }
+  el.innerHTML = `
+    <div class="hist">
+      ${days.map(([k,v])=>`
+        <div class="hist-day">
+          <div class="hist-bars">
+            <i style="height:${v.fini/max*100}%;background:var(--green)" title="${v.fini} terminées"></i>
+            <i style="height:${(v.total-v.fini-v.annul)/max*100}%;background:var(--accent)" title="${v.total-v.fini-v.annul} en cours/attribuées"></i>
+            <i style="height:${v.annul/max*100}%;background:var(--red)" title="${v.annul} annulées"></i>
+          </div>
+          <div class="hist-lab">${k}</div>
+        </div>`).join('')}
+    </div>
+    <div class="hist-legend">
+      <span><i style="background:var(--green)"></i> Terminées</span>
+      <span><i style="background:var(--accent)"></i> En cours / attribuées</span>
+      <span><i style="background:var(--red)"></i> Annulées</span>
+    </div>`;
+  const totalCA = days.reduce((a,[k,v])=>a+v.ca,0);
+  document.getElementById('histSummary').textContent = `${days.length} jour${days.length>1?'s':''} · ${fmtMoney(totalCA)} cumulés`;
+}
+
+/* ---------- Analyse par ligne d'appel ---------- */
+function renderLigneAnalyse(){
+  const I = STATE.interventions||[];
+  const map = {};
+  I.forEach(x=>{
+    const l = (x.ligne_appel||'—').toString().trim();
+    map[l] = map[l] || {nom:l, total:0, fini:0, annul:0, ca:0};
+    map[l].total++;
+    const c = statutCat(x.statut);
+    if(c==='cloture'){ map[l].fini++; map[l].ca += num(x.prix); }
+    if(c==='annule') map[l].annul++;
+  });
+  const arr = Object.values(map).sort((a,b)=>b.total-a.total);
+  const el = document.getElementById('ligneAnalyse');
+  el.innerHTML = `<div class="la-row head"><span>Ligne</span><span class="m">Inter.</span><span class="m">CA</span><span class="tx">Réussite</span></div>` +
+    arr.map(s=>{
+      const ls = ligneStyle(s.nom);
+      const tx = s.total? Math.round((s.total-s.annul)/s.total*100):0;
+      const txCls = tx>=70?'hi':tx>=40?'mid':'lo';
+      return `<div class="la-row">
+        <span class="ln" style="background:${ls.bg};color:${ls.c}">${esc(s.nom)}</span>
+        <span class="m"><b>${s.total}</b></span>
+        <span class="m">${fmtMoney(s.ca)}</span>
+        <span class="tx pc ${txCls}">${tx}%</span>
+      </div>`;
+    }).join('') || `<div class="empty">Pas de données.</div>`;
+}
+
+/* ---------- Clients récurrents ---------- */
+function renderRecur(){
+  const I = STATE.interventions||[];
+  const map = {};
+  I.forEach(x=>{
+    const key = (x.tel_client||x.nom_client||'').toString().trim();
+    if(!key) return;
+    map[key] = map[key] || {nom:x.nom_client||'?', tel:x.tel_client||'', count:0, villes:new Set()};
+    map[key].count++;
+    if(x.cp_ville) map[key].villes.add(x.cp_ville);
+  });
+  const arr = Object.values(map).filter(c=>c.count>1).sort((a,b)=>b.count-a.count);
+  document.getElementById('recurCount').textContent = arr.length;
+  document.getElementById('recurList').innerHTML = arr.map(c=>{
+    const init = (c.nom||'?').trim().slice(0,2).toUpperCase();
+    return `<div class="recur-item">
+      <div class="recur-av">${esc(init)}</div>
+      <div class="info">
+        <div class="nm">${esc(c.nom)}</div>
+        <div class="s">${esc(c.tel)} · ${[...c.villes].join(', ')||'—'}</div>
+      </div>
+      <div class="cnt">${c.count}×</div>
+    </div>`;
+  }).join('') || `<div class="empty">Aucun client récurrent.</div>`;
+}
+
+/* ---------- Détection de doublons ---------- */
+function renderDup(){
+  const I = STATE.interventions||[];
+  // doublon = même tel_client + même adresse créés à moins de 30 min d'intervalle
+  const groups = {};
+  I.forEach(x=>{
+    const key = ((x.tel_client||'')+'|'+(x.adresse||'')).toLowerCase().trim();
+    if(key==='|') return;
+    groups[key] = groups[key] || [];
+    groups[key].push(x);
+  });
+  const dups = [];
+  Object.values(groups).forEach(g=>{
+    if(g.length<2) return;
+    g.sort((a,b)=>(parseDate(a.date_creation)||0)-(parseDate(b.date_creation)||0));
+    // ne garder que les groupes avec au moins 2 créés à moins de 30 min
+    let cluster=[g[0]];
+    for(let i=1;i<g.length;i++){
+      const prev=parseDate(g[i-1].date_creation), cur=parseDate(g[i].date_creation);
+      if(prev&&cur&&(cur-prev)/60000<=30){ cluster.push(g[i]); }
+      else { if(cluster.length>=2) dups.push([...cluster]); cluster=[g[i]]; }
+    }
+    if(cluster.length>=2) dups.push([...cluster]);
+  });
+  document.getElementById('dupCount').textContent = dups.length;
+  document.getElementById('dupList').innerHTML = dups.map(cl=>{
+    const x0 = cl[0];
+    return `<div class="dup-item">
+      <div class="h">⚠️ ${esc(x0.nom_client||'?')} · ${esc(x0.cp_ville||'')} <span style="color:var(--amber);font-family:'IBM Plex Mono';font-size:11.5px">${cl.length} créations rapprochées</span></div>
+      <div class="ids">${cl.map(x=>`<span class="id">${esc(x.inter_id)}</span> ${heureOf(x)} (${esc(STATUT_LABEL[statutCat(x.statut)])})`).join('<br>')}</div>
+    </div>`;
+  }).join('') || `<div class="empty">Aucun doublon détecté.</div>`;
+}
+
+/* ---------- Finance ---------- */
+function renderFinance(){
+  const I = STATE.interventions||[];
+  const fin = I.filter(x=>statutCat(x.statut)==='cloture');
+  const caJour = fin.reduce((a,x)=>a+num(x.prix),0);
+  const camTot = fin.reduce((a,x)=>a+num(x.cam),0);
+  const acompteTot = I.reduce((a,x)=>a+num(x.acompte),0);
+  const soldeRdv = I.filter(x=>statutCat(x.statut)==='rdv').reduce((a,x)=>a+(num(x.prix)-num(x.acompte)),0);
+  const panier = fin.filter(x=>num(x.prix)>0).length? Math.round(caJour/fin.filter(x=>num(x.prix)>0).length):0;
+  const marge = caJour - camTot;
+
+  const cards = [
+    {l:'CA facturé (jour)', v:fmtMoney(caJour), m:`${fin.length} interventions`},
+    {l:'Coût matériel', v:fmtMoney(camTot), m:'CAM cumulé'},
+    {l:'Marge brute', v:fmtMoney(marge), m:'CA − matériel'},
+    {l:'Panier moyen', v:fmtMoney(panier), m:'par intervention'},
+    {l:'Acomptes encaissés', v:fmtMoney(acompteTot), m:'toutes interventions'},
+    {l:'Soldes restants (RDV)', v:fmtMoney(soldeRdv), m:'à encaisser'},
+  ];
+  document.getElementById('finCards').innerHTML = cards.map(c=>`
+    <div class="fin-card"><div class="l">${c.l}</div><div class="v">${c.v}</div><div class="m">${c.m}</div></div>`).join('');
+
+  // ventilation par tech
+  const byTech = {};
+  fin.forEach(x=>{ const t=(x.tech_assigne_nom||'?').trim(); byTech[t]=(byTech[t]||0)+num(x.prix); });
+  const arr = Object.entries(byTech).sort((a,b)=>b[1]-a[1]);
+  const max = Math.max(1,...arr.map(e=>e[1]));
+  document.getElementById('finByTech').innerHTML = arr.map(([t,v])=>`
+    <div class="ligne-row">
+      <span class="nm" style="background:var(--accent-soft);color:var(--accent)">${esc(t)}</span>
+      <div class="track"><i style="width:${v/max*100}%;background:var(--green)"></i></div>
+      <span class="cnt">${fmtMoney(v)}</span>
+    </div>`).join('') || `<div class="empty">Aucune intervention facturée.</div>`;
+}
+
+/* ============================================================
+   ACTIONS depuis le dashboard (POST vers webhook n8n d'écriture)
+   ============================================================ */
+let ACT_CTX = null;
+
+// quelles actions sont possibles selon le statut
+function actionsFor(x){
+  const c = statutCat(x.statut);
+  const a = [];
+  if(c==='attente'||c==='validation'){ a.push('prendre'); a.push('annuler'); a.push('note'); }
+  if(c==='assigne'){ a.push('cloturer'); a.push('rdv_confirm'); a.push('reassigner'); a.push('annuler'); a.push('note'); }
+  if(c==='rdv'){ a.push('rdv_confirm'); a.push('cloturer'); a.push('annuler'); a.push('note'); }
+  return a;
+}
+const ACT_META = {
+  prendre:    {label:'Prendre',     cls:'g', ic:'<path d="M20 6L9 17l-5-5"/>'},
+  cloturer:   {label:'Clôturer',    cls:'g', ic:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'},
+  rdv_confirm:{label:'Confirmer RDV',cls:'', ic:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>'},
+  reassigner: {label:'Réassigner',  cls:'', ic:'<path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8"/>'},
+  annuler:    {label:'Annuler',     cls:'r', ic:'<circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>'},
+  note:       {label:'Note',        cls:'', ic:'<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/>'},
+};
+function actBtnHtml(x, idx){
+  const acts = actionsFor(x);
+  if(!acts.length) return '';
+  return `<div class="inter-actions">` + acts.map(a=>{
+    const m = ACT_META[a];
+    return `<button class="btn-act ${m.cls}" data-act="${a}" data-actidx="${idx}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${m.ic}</svg>${m.label}</button>`;
+  }).join('') + `</div>`;
+}
+
+function openAction(x, action){
+  ACT_CTX = {x, action};
+  const m = ACT_META[action];
+  document.getElementById('actTitle').textContent = `${m.label} · ${x.inter_id||''}`;
+  const techOptions = (STATE.techniciens||[])
+    .map(t=>(t['Nom du partenaire']||'').toString().trim()).filter(Boolean)
+    .map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  let body = '';
+  if(action==='prendre' || action==='reassigner'){
+    body = `<div class="af-summary">${action==='prendre'?'Assigner':'Réassigner'} <b>${esc(x.type||'')}</b> (${esc(x.cp_ville||'')}) à un technicien.</div>
+      <div class="af-label">Technicien</div>
+      <select class="af-select" id="actTech">${techOptions}</select>`;
+  } else if(action==='cloturer'){
+    body = `<div class="af-summary">Clôturer l'intervention <b>${esc(x.inter_id)}</b> et enregistrer le montant.</div>
+      <div class="af-label">Montant facturé (€)</div>
+      <input class="af-input" id="actPrix" type="number" value="${esc(x.prix||'')}" placeholder="0">
+      <div class="af-label">Coût matériel (€)</div>
+      <input class="af-input" id="actCam" type="number" value="${esc(x.cam||'')}" placeholder="0">`;
+  } else if(action==='rdv_confirm'){
+    body = `<div class="af-summary">Confirmer le RDV pour <b>${esc(x.inter_id)}</b>.</div>
+      <div class="af-label">Date & heure du RDV</div>
+      <input class="af-input" id="actRdv" type="text" value="${esc(x.date_rdv||'')}" placeholder="JJ/MM/AAAA HH:MM">`;
+  } else if(action==='annuler'){
+    body = `<div class="af-summary">Annuler l'intervention <b>${esc(x.inter_id)}</b>. Cette action sera enregistrée.</div>
+      <div class="af-label">Raison de l'annulation</div>
+      <input class="af-input" id="actRaison" type="text" placeholder="Ex : client a trouvé une autre solution">`;
+  } else if(action==='note'){
+    body = `<div class="af-summary">Ajouter une observation à <b>${esc(x.inter_id)}</b>.</div>
+      <div class="af-label">Observation</div>
+      <textarea class="rl-edit" id="actNote" placeholder="Votre note…">${esc(x.observation||'')}</textarea>`;
+  }
+  document.getElementById('actBody').innerHTML = body + `
+    <div class="rl-actions">
+      <button class="btn" id="actCancel">Annuler</button>
+      <button class="btn primary" id="actConfirm">Confirmer</button>
+    </div>`;
+  document.getElementById('actCancel').onclick=closeAction;
+  document.getElementById('actConfirm').onclick=sendAction;
+  document.getElementById('actBg').classList.add('open');
+}
+
+async function sendAction(){
+  const {x, action} = ACT_CTX;
+  const payload = { action, secret:getSecret(), inter_id:x.inter_id||'', ligne_appel:x.ligne_appel||'' };
+  if(action==='prendre'||action==='reassigner') payload.tech = document.getElementById('actTech').value;
+  if(action==='cloturer'){ payload.prix = document.getElementById('actPrix').value; payload.cam = document.getElementById('actCam').value; }
+  if(action==='rdv_confirm') payload.date_rdv = document.getElementById('actRdv').value;
+  if(action==='annuler') payload.raison = document.getElementById('actRaison').value;
+  if(action==='note') payload.observation = document.getElementById('actNote').value;
+
+  const url = document.getElementById('actionUrl').value.trim();
+  const btn = document.getElementById('actConfirm');
+  if(btn){ btn.disabled=true; btn.textContent='Envoi…'; }
+
+  if(!url){
+    setTimeout(()=>{ closeAction(); toast(`Action "${ACT_META[action].label}" simulée (démo) ✓`,'ok'); }, 500);
+    return;
+  }
+  try{
+    const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    closeAction();
+    toast(`${ACT_META[action].label} envoyé ✓`,'ok');
+    setTimeout(load, 800); // recharger les données après l'action
+  }catch(e){
+    if(btn){ btn.disabled=false; btn.textContent='Confirmer'; }
+    toast(`Échec : `+e.message,'err');
+  }
+}
+function closeAction(){ document.getElementById('actBg').classList.remove('open'); ACT_CTX=null; }
+
+
+/* ---------- Boot ---------- */
+document.getElementById('actBg').onclick=(e)=>{ if(e.target.id==='actBg') closeAction(); };
+STATE = DEMO();
+setLive(false);
+render();
+goTo('dispatch');
+// charge les réglages sauvegardés ; si une URL de lecture existe, connexion auto
+const _saved = loadSettings();
+if(_saved.webhookUrl){ scheduleRefresh(); load(); }
+</script>
+</body>
+</html>
