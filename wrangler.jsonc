@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "mr-dispatch-dashboard",
+  "name": "raspy-breeze-d96c",
   "main": "_worker.js",
   "compatibility_date": "2026-05-28",
   "observability": {
