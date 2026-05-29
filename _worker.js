@@ -1,8 +1,9 @@
-// MR Dispatch — Worker : sert le dashboard + gère /data (lecture), /push (écriture n8n) et /relance (relances WhatsApp)
+// MR Dispatch — Worker : sert le dashboard + gère /data (lecture), /push (écriture n8n), /relance et /action
 const SECRET = "MR_DISPATCH_2026"; // clé secrète : à reporter dans n8n
 
-// URL du webhook n8n qui envoie la relance via Whapi (à mettre à jour avec ta vraie URL n8n)
+// URLs des webhooks n8n
 const RELANCE_WEBHOOK_URL = "https://mrdispatch.app.n8n.cloud/webhook/dashboard-relance";
+const ACTION_WEBHOOK_URL  = "https://mrdispatch.app.n8n.cloud/webhook/dashboard-action";
 
 export default {
   async fetch(request, env) {
@@ -70,6 +71,42 @@ export default {
       // Transmet la demande à n8n qui se chargera de l'envoi via Whapi
       try {
         const r = await fetch(RELANCE_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!r.ok) {
+          return new Response(JSON.stringify({ ok: false, error: "Erreur n8n: " + r.status }), {
+            status: 502, headers: { ...cors, "Content-Type": "application/json" },
+          });
+        }
+        return new Response(JSON.stringify({ ok: true }), {
+          headers: { ...cors, "Content-Type": "application/json" },
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: "Erreur reseau: " + e.message }), {
+          status: 502, headers: { ...cors, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // POST /action — le dashboard demande une action (assigner, reassigner, note...)
+    if (url.pathname === "/action" && request.method === "POST") {
+      let body;
+      try {
+        body = await request.json();
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: "JSON invalide" }), {
+          status: 400, headers: { ...cors, "Content-Type": "application/json" },
+        });
+      }
+      if (body.secret !== SECRET) {
+        return new Response(JSON.stringify({ ok: false, error: "Cle secrete invalide" }), {
+          status: 401, headers: { ...cors, "Content-Type": "application/json" },
+        });
+      }
+      try {
+        const r = await fetch(ACTION_WEBHOOK_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
